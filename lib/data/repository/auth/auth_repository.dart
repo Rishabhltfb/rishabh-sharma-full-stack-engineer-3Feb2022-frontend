@@ -31,12 +31,13 @@ class AuthRepository {
         var resBody = jsonDecode(response.body);
 
         String jwtToken = resBody['data']['jwtToken'];
+        String refreshToken = resBody['data']['refreshToken'];
         await _secureStorageRepository.secureWrite(
             JWT_TOKEN_SECURE_STORAGE, jwtToken);
-        await _secureStorageRepository.secureWrite(REFRESH_TOKEN_SECURE_STORAGE,
-            response.headers["x-access-token"] ?? "");
+        await _secureStorageRepository.secureWrite(
+            REFRESH_TOKEN_SECURE_STORAGE, refreshToken);
         TokenService().jwtToken = jwtToken;
-        TokenService().refreshToken = response.headers["x-access-token"] ?? "";
+        TokenService().refreshToken = refreshToken;
         return Future.value(true);
       } else {
         return Future.value(false);
