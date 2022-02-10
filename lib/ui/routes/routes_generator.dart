@@ -1,4 +1,5 @@
 import 'package:client/ui/screens/auth_screen/auth_screen.dart';
+import 'package:client/ui/screens/home_screen/home_screen.dart';
 import 'package:client/ui/screens/splash_screen/splash_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,10 @@ class Router {
       case AuthScreen.route:
         return MaterialPageRoute(
           builder: (context) => const AuthScreen(),
+        );
+      case HomeScreen.route:
+        return MaterialPageRoute(
+          builder: (context) => const HomeScreen(),
         );
       default:
         return MaterialPageRoute(
