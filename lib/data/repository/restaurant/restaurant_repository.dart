@@ -15,7 +15,8 @@ class RestaurantRepository {
   Future<List<Restaurant>> fetchAllRestaurants() async {
     List<Restaurant> restaurantList = [];
     Response res = await _restaurantApi.fetchAllRestaurants();
-    dynamic data = jsonDecode(res.data['data']);
+
+    dynamic data = res.data['data'];
     data.forEach((ele) {
       restaurantList.add(Restaurant.fromMap(ele));
     });

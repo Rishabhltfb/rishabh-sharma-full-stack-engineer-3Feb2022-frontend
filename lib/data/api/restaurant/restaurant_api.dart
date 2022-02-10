@@ -21,7 +21,6 @@ class RestaurantApi {
     Response res;
     try {
       res = await _client.dio.get(BASE_URL + url);
-      log(res.toString(), name: 'Restaurant res:');
     } catch (err) {
       throw Exception(err);
     }

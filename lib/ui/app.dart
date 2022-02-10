@@ -1,4 +1,5 @@
 import 'package:client/logic/cubit/auth_cubit.dart';
+import 'package:client/logic/cubit/restaurant_cubit.dart';
 import 'package:client/ui/screens/splash_screen/splash_screen.dart';
 import 'package:client/utils/app_utils.dart';
 import 'package:client/utils/theme.dart';
@@ -30,6 +31,10 @@ class _AppState extends State<App> {
         BlocProvider(
           lazy: false,
           create: (context) => AuthCubit(),
+        ),
+        BlocProvider(
+          lazy: false,
+          create: (context) => RestaurantCubit(),
         ),
       ],
       child: MaterialApp(
