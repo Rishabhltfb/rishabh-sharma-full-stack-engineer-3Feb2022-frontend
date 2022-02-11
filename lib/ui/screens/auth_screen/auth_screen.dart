@@ -243,6 +243,9 @@ class _AuthScreenState extends State<AuthScreen> {
             await BlocProvider.of<AuthCubit>(context).signIn(authBody);
         if (success) {
           Navigator.pushReplacementNamed(context, HomeScreen.route);
+        } else {
+          _passwordValidated.value = false;
+          _emailValidated.value = false;
         }
       }
     }

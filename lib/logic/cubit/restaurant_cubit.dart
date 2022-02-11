@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:client/data/models/restaurant.dart';
+import 'package:client/data/repository/filter/filter_repository.dart';
 import 'package:client/data/repository/restaurant/restaurant_repository.dart';
 import 'package:client/utils/util_functions.dart';
 import 'package:meta/meta.dart';
@@ -10,6 +11,7 @@ part 'restaurant_state.dart';
 
 class RestaurantCubit extends Cubit<RestaurantState> {
   final RestaurantRepository _restaurantRepository = RestaurantRepository();
+  final FilterRepository _filterRepository = FilterRepository();
 
   RestaurantCubit() : super(const RestaurantInitial());
 
@@ -34,5 +36,36 @@ class RestaurantCubit extends Cubit<RestaurantState> {
       emit(RestaurantError(err.toString()));
       return false;
     }
+  }
+
+  Future<List<Restaurant>> filterByRestaurantName(String name) async {
+    try {
+      List<Restaurant> filteredRestaurantsList =
+          await _filterRepository.filterByRestaurantName(name);
+      emit(RestaurantFilterApplied(filteredRestaurantsList));
+      return filteredRestaurantsList;
+    } catch (err) {
+      log(err.toString());
+      emit(RestaurantError(err.toString()));
+      return [];
+    }
+  }
+
+  Future<List<Restaurant>> filterByDayTime(
+      String day, int startTime, int endTime) async {
+    try {
+      List<Restaurant> filteredRestaurantsList =
+          await _filterRepository.filterByDayTime(day, startTime, endTime);
+      emit(RestaurantFilterApplied(filteredRestaurantsList));
+      return filteredRestaurantsList;
+    } catch (err) {
+      log(err.toString());
+      emit(RestaurantError(err.toString()));
+      return [];
+    }
+  }
+
+  void resetFilter(List<Restaurant> restaurantList) {
+    emit(RestaurantLoaded(restaurantList));
   }
 }
