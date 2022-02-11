@@ -1,13 +1,13 @@
 import 'dart:developer';
 
-import 'package:client/data/api/collection/collection_api.dart';
 import 'package:client/logic/cubit/auth_cubit.dart';
 import 'package:client/ui/screens/auth_screen/auth_screen.dart';
 import 'package:client/ui/screens/home_screen/home_screen.dart';
-import 'package:client/utils/color_pallet.dart';
+import 'package:client/utils/assets.dart';
 import 'package:client/utils/dimensions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
 
 class SplashScreen extends StatefulWidget {
   static const String route = '/splash';
@@ -48,17 +48,27 @@ class _SplashScreenState extends State<SplashScreen> {
           log('Inside Listener', name: 'AuthCubit');
           if (state is AuthLoaded) {
             bool isTokenValid = state.isAuthenticated;
-            if (isTokenValid) {
-              Navigator.of(context).pushReplacementNamed(HomeScreen.route);
-            } else {
-              Navigator.of(context).pushReplacementNamed(AuthScreen.route);
-            }
+            Future.delayed(const Duration(seconds: 4)).then((value) {
+              if (isTokenValid) {
+                Navigator.of(context).pushReplacementNamed(HomeScreen.route);
+              } else {
+                Navigator.of(context).pushReplacementNamed(AuthScreen.route);
+              }
+            });
           }
         },
         child: Container(
           height: height,
           width: width,
-          color: color1,
+          color: Colors.black,
+          child: Center(
+            child: SizedBox(
+              height: 100,
+              width: 100,
+              child: Lottie.network(RestaurantAssets.splashLottieIcon,
+                  reverse: true),
+            ),
+          ),
         ),
       ),
     );
