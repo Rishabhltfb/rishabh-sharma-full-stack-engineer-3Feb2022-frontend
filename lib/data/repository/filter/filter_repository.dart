@@ -16,7 +16,7 @@ class FilterRepository {
   Future<List<Restaurant>> filterByRestaurantName(String name) async {
     List<Restaurant> restaurantList = [];
     Response res = await _filterApi.filterByRestaurantName(name);
-    dynamic data = jsonDecode(res.data['data']);
+    dynamic data = res.data['data'];
     data.forEach((ele) {
       restaurantList.add(Restaurant.fromMap(ele));
     });
@@ -27,7 +27,7 @@ class FilterRepository {
       String day, int startTime, int endTime) async {
     List<Restaurant> restaurantList = [];
     Response res = await _filterApi.filterByDayTime(day, startTime, endTime);
-    dynamic data = jsonDecode(res.data['data']);
+    dynamic data = res.data['data'];
     data.forEach((ele) {
       restaurantList.add(Restaurant.fromMap(ele));
     });

@@ -26,10 +26,11 @@ class TokenService {
             .secureRead(REFRESH_TOKEN_SECURE_STORAGE) ??
         "";
     if (refreshToken.isNotEmpty && jwtToken.isNotEmpty) {
-      return Future.value(true);
-    } else {
-      return Future.value(false);
+      if (!isTokenExpired(refreshToken)) {
+        return Future.value(true);
+      }
     }
+    return Future.value(false);
   }
 
   bool isTokenExpired(String _token) {

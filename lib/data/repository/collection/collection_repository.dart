@@ -16,7 +16,7 @@ class CollectionRepository {
   Future<List<Collection>> getUserCollections() async {
     List<Collection> collectionList = [];
     Response res = await _collectionApi.getUserCollections();
-    dynamic data = jsonDecode(res.data['data']);
+    dynamic data = res.data['data'];
     data.forEach((ele) {
       collectionList.add(Collection.fromMap(ele));
     });
@@ -25,7 +25,7 @@ class CollectionRepository {
 
   Future<Collection> createUserCollection(Collection collection) async {
     Response res = await _collectionApi.createUserCollection(collection);
-    dynamic data = jsonDecode(res.data['data']);
+    dynamic data = res.data['data'];
     return Collection.fromMap(data);
   }
 
