@@ -28,7 +28,7 @@ class LoadingScreen extends StatelessWidget {
               borderRadius: BorderRadius.all(Radius.circular(20)),
             ),
             child: Center(
-              child: SvgPicture.asset(RestaurantAssets.shimmer_bg),
+              child: SvgPicture.asset(RestaurantAssets.shimmerBg),
             ),
           ),
           spacer,

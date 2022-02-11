@@ -21,6 +21,7 @@ dependencies:
     jwt_decode: ^0.3.1
     flutter_bloc: ^8.0.1
     shimmer: ^2.0.0
+    time_picker_widget: ^1.0.0+10
 
 dev_dependencies:
     flutter_test:
