@@ -1,3 +1,5 @@
+import 'dart:math';
+
 class UtilFunctions {
   static bool listEquals(List a, List b) {
     int sizeA = a.length;
@@ -8,4 +10,7 @@ class UtilFunctions {
     }
     return true;
   }
+
+  static int getRandomNumber(int min, int max) =>
+      min + Random().nextInt(max - min);
 }

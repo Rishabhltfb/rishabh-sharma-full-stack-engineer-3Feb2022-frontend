@@ -22,7 +22,10 @@ class RestaurantTile extends StatelessWidget {
         padding: const EdgeInsets.all(15.0),
         child: PhysicalModel(
           color: Colors.transparent,
-          elevation: 8.0,
+          elevation: 5.0,
+          borderRadius: const BorderRadius.all(
+            Radius.circular(10),
+          ),
           child: Container(
             height: vpH * 0.15,
             width: vpW * 0.85,

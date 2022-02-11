@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:client/data/models/dummy_data.dart';
 import 'package:client/utils/assets.dart';
+import 'package:client/utils/util_functions.dart';
 import 'package:flutter/foundation.dart';
 
 class Restaurant {
@@ -49,7 +51,8 @@ class Restaurant {
       restaurantName: map['restaurantName'] ?? '',
       schedule: Map<String, dynamic>.from(map['schedule']),
       time: map['time'] ?? '',
-      image: RestaurantAssets.authBg,
+      image: DummyData().restaurantImageList[UtilFunctions.getRandomNumber(
+          0, DummyData().restaurantImageList.length - 1)],
     );
   }
 

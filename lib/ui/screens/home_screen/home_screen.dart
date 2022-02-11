@@ -1,11 +1,16 @@
 import 'dart:developer';
 
 import 'package:client/data/models/restaurant.dart';
+import 'package:client/logic/cubit/auth_cubit.dart';
 import 'package:client/logic/cubit/restaurant_cubit.dart';
 import 'package:client/ui/common_widgets/shimmer/loading_screen.dart';
+import 'package:client/ui/screens/home_screen/components/clear_filter_widget.dart';
 import 'package:client/ui/screens/home_screen/components/restaurant_card.dart';
 import 'package:client/ui/screens/home_screen/components/restaurant_tile.dart';
+import 'package:client/ui/screens/home_screen/components/search_widget.dart';
+import 'package:client/ui/screens/profile_screen/profile_screen.dart';
 import 'package:client/ui/screens/restaurant_screen/restaurant_screen.dart';
+import 'package:client/utils/color_pallet.dart';
 import 'package:client/utils/dimensions.dart';
 import 'package:client/utils/text_theme.dart';
 import 'package:flutter/material.dart';
@@ -66,61 +71,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       duration: const Duration(seconds: 1),
                       curve: Curves.easeIn);
                 },
-                backgroundColor: Colors.orange,
+                backgroundColor: Colors.black,
                 child: const Icon(Icons.arrow_upward_outlined),
               );
             }
             return const SizedBox();
           }),
       body: homeBody(),
-    );
-  }
-
-  Widget searchWidget(double width) {
-    return SizedBox(
-      width: width * 0.9,
-      child: ValueListenableBuilder(
-        valueListenable: searchError,
-        builder: (context, value, child) => TextField(
-          controller: _searchTextController,
-          maxLines: null,
-          textInputAction: TextInputAction.search,
-          decoration: InputDecoration(
-            errorText:
-                searchError.value ? 'Search length should be  > 3' : null,
-            icon: const Icon(Icons.search),
-            hintText: "Restaurant search eg. Osakaya Restaurant",
-            border: const UnderlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.grey,
-              ),
-            ),
-            enabledBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.grey,
-              ),
-            ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          onChanged: (value) {
-            restaurantSearch.value = value;
-          },
-          onEditingComplete: () {
-            FocusScope.of(context).requestFocus(FocusNode());
-            if (restaurantSearch.value.length > 2) {
-              searchError.value = false;
-              BlocProvider.of<RestaurantCubit>(context)
-                  .filterByRestaurantName(restaurantSearch.value);
-            } else {
-              searchError.value = true;
-            }
-          },
-        ),
-      ),
     );
   }
 
@@ -139,9 +96,21 @@ class _HomeScreenState extends State<HomeScreen> {
           return RestaurantTile(
             restaurant: restaurant,
             onTap: () {
-              recentSearchedRestaurantsList.value =
-                  List.from(recentSearchedRestaurantsList.value)
-                    ..add(restaurant);
+              bool isFound = false;
+              for (int i = 0;
+                  i < recentSearchedRestaurantsList.value.length;
+                  i++) {
+                if (recentSearchedRestaurantsList.value[i].id ==
+                    restaurant.id) {
+                  isFound = true;
+                  break;
+                }
+              }
+              if (!isFound) {
+                recentSearchedRestaurantsList.value =
+                    List.from(recentSearchedRestaurantsList.value)
+                      ..add(restaurant);
+              }
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) {
                   return RestaurantScreen(restaurant: restaurant);
@@ -150,35 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           );
         },
-      ),
-    );
-  }
-
-  Widget clearFilter() {
-    return Center(
-      child: GestureDetector(
-        onTap: () {
-          BlocProvider.of<RestaurantCubit>(context)
-              .resetFilter(allRestaurants, recentSearchedRestaurantsList.value);
-          _searchTextController.text = '';
-        },
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.all(
-              Radius.circular(30),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: const [
-              Text('Clear Filter'),
-              SizedBox(width: 5),
-              Icon(Icons.clear),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -209,35 +149,38 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 50),
+                    headerWidget(),
+                    spacer,
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text(
-                        'Search',
-                        style: kTitle0.copyWith(fontWeight: FontWeight.bold),
+                      child: SearchWidget(
+                        searchError: searchError,
+                        searchTextController: _searchTextController,
+                        getTime: (initialTime, finalTime) {
+                          log(initialTime.toString());
+                          log(finalTime.toString());
+                        },
                       ),
                     ),
                     spacer,
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: searchWidget(width),
-                    ),
-                    spacer,
-                    (recentSearchedRestaurantsList.value.isNotEmpty)
-                        ? Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Text(
-                              'Recent Searches',
-                              style:
-                                  kTitle2.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                          )
-                        : spacer,
                     ValueListenableBuilder(
                       valueListenable: recentSearchedRestaurantsList,
                       builder: (context, value, child) {
                         if (recentSearchedRestaurantsList.value.isNotEmpty) {
-                          return recentSearchListView(height, width);
+                          return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16.0),
+                                  child: Text(
+                                    'Recent search',
+                                    style: kTitle2.copyWith(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                                recentSearchListView(height, width)
+                              ]);
                         } else {
                           return const SizedBox();
                         }
@@ -255,7 +198,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           )
                         : spacer,
                     (state is RestaurantFilterApplied)
-                        ? clearFilter()
+                        ? ClearFilterWidget(onTap: () {
+                            BlocProvider.of<RestaurantCubit>(context)
+                                .resetFilter(allRestaurants,
+                                    recentSearchedRestaurantsList.value);
+                            _searchTextController.text = '';
+                          })
                         : const SizedBox(),
                     restaurantListView(restaurantsList)
                   ]),
@@ -279,9 +227,44 @@ class _HomeScreenState extends State<HomeScreen> {
           Restaurant restaurant = recentSearchedRestaurantsList.value[index];
           return RestaurantCard(
             restaurant: restaurant,
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) {
+                  return RestaurantScreen(restaurant: restaurant);
+                },
+              ));
+            },
           );
         },
+      ),
+    );
+  }
+
+  Widget headerWidget() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Search',
+            style: kTitle0.copyWith(fontWeight: FontWeight.bold),
+          ),
+          GestureDetector(
+            onTap: () {
+              BlocProvider.of<AuthCubit>(context).logoutUser();
+              // Navigator.pushNamed(context, ProfileScreen.route);
+            },
+            child: const CircleAvatar(
+              backgroundColor: Colors.black,
+              radius: 18,
+              child: Icon(
+                Icons.logout,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

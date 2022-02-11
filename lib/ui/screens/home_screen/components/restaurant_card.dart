@@ -47,7 +47,7 @@ class RestaurantCard extends StatelessWidget {
                 ),
                 spacer,
                 Text(
-                  restaurant.restaurantName * 2,
+                  restaurant.restaurantName,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   maxLines: 1,

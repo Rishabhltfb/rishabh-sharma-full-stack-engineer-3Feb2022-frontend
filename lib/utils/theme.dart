@@ -6,7 +6,7 @@ final ThemeData theme = ThemeData(
   appBarTheme:
       const AppBarTheme(systemOverlayStyle: SystemUiOverlayStyle.light),
   scaffoldBackgroundColor: Colors.white.withOpacity(0.95),
-  primaryColor: Colors.orange,
+  primaryColor: Colors.black,
   splashColor: Colors.white,
   disabledColor: Colors.grey,
   cardColor: Colors.white,

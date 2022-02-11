@@ -27,9 +27,6 @@ class LoadingScreen extends StatelessWidget {
               color: Color(0xffF6F8F9),
               borderRadius: BorderRadius.all(Radius.circular(20)),
             ),
-            child: Center(
-              child: SvgPicture.asset(RestaurantAssets.shimmerBg),
-            ),
           ),
           spacer,
           spacer,
