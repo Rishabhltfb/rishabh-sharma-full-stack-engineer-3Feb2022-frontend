@@ -15,7 +15,9 @@ class RestaurantLoading extends RestaurantState {
 
 class RestaurantLoaded extends RestaurantState {
   final List<Restaurant> restaurantsList;
-  const RestaurantLoaded(this.restaurantsList);
+  final List<Restaurant> recentSearchedRestaurantsList;
+  const RestaurantLoaded(
+      this.restaurantsList, this.recentSearchedRestaurantsList);
 
   @override
   bool operator ==(Object other) {

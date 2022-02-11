@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:client/utils/assets.dart';
 import 'package:flutter/foundation.dart';
 
 class Restaurant {
@@ -7,11 +8,13 @@ class Restaurant {
   String restaurantName = '';
   Map<String, dynamic>? schedule;
   String time = '';
+  String image;
   Restaurant({
     this.id,
     required this.restaurantName,
     this.schedule,
     required this.time,
+    required this.image,
   });
 
   Restaurant copyWith({
@@ -19,12 +22,14 @@ class Restaurant {
     String? restaurantName,
     Map<String, dynamic>? schedule,
     String? time,
+    String? image,
   }) {
     return Restaurant(
       id: id ?? this.id,
       restaurantName: restaurantName ?? this.restaurantName,
       schedule: schedule ?? this.schedule,
       time: time ?? this.time,
+      image: image ?? this.image,
     );
   }
 
@@ -34,6 +39,7 @@ class Restaurant {
       'restaurantName': restaurantName,
       'schedule': schedule,
       'time': time,
+      'image': image,
     };
   }
 
@@ -43,6 +49,7 @@ class Restaurant {
       restaurantName: map['restaurantName'] ?? '',
       schedule: Map<String, dynamic>.from(map['schedule']),
       time: map['time'] ?? '',
+      image: RestaurantAssets.authBg,
     );
   }
 
@@ -53,7 +60,7 @@ class Restaurant {
 
   @override
   String toString() {
-    return 'Restaurant(id: $id, restaurantName: $restaurantName, schedule: $schedule, time: $time)';
+    return 'Restaurant(id: $id, restaurantName: $restaurantName, schedule: $schedule, time: $time, image: $image)';
   }
 
   @override
@@ -64,7 +71,8 @@ class Restaurant {
         other.id == id &&
         other.restaurantName == restaurantName &&
         mapEquals(other.schedule, schedule) &&
-        other.time == time;
+        other.time == time &&
+        other.image == image;
   }
 
   @override
@@ -72,6 +80,7 @@ class Restaurant {
     return id.hashCode ^
         restaurantName.hashCode ^
         schedule.hashCode ^
-        time.hashCode;
+        time.hashCode ^
+        image.hashCode;
   }
 }

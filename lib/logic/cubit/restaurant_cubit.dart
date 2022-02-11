@@ -19,7 +19,7 @@ class RestaurantCubit extends Cubit<RestaurantState> {
     try {
       List<Restaurant> restaurantsList =
           await _restaurantRepository.fetchAllRestaurants();
-      emit(RestaurantLoaded(restaurantsList));
+      emit(RestaurantLoaded(restaurantsList, const []));
       return restaurantsList;
     } catch (err) {
       log(err.toString());
@@ -65,7 +65,13 @@ class RestaurantCubit extends Cubit<RestaurantState> {
     }
   }
 
-  void resetFilter(List<Restaurant> restaurantList) {
-    emit(RestaurantLoaded(restaurantList));
+  void resetFilter(List<Restaurant> restaurantList,
+      List<Restaurant> recentSearchedRestaurantsList) {
+    emit(RestaurantLoaded(restaurantList, recentSearchedRestaurantsList));
+  }
+
+  void addRecentSearchedRestaurants(List<Restaurant> restaurantList,
+      List<Restaurant> recentSearchedRestaurantsList) {
+    emit(RestaurantLoaded(restaurantList, recentSearchedRestaurantsList));
   }
 }

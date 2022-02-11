@@ -1,12 +1,13 @@
 import 'package:client/data/models/restaurant.dart';
-import 'package:client/ui/screens/restaurant_screen/restaurant_screen.dart';
-import 'package:client/utils/assets.dart';
 import 'package:client/utils/dimensions.dart';
 import 'package:flutter/material.dart';
 
 class RestaurantTile extends StatelessWidget {
   final Restaurant restaurant;
-  const RestaurantTile({Key? key, required this.restaurant}) : super(key: key);
+  final Function() onTap;
+  const RestaurantTile(
+      {Key? key, required this.restaurant, required this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,13 +17,7 @@ class RestaurantTile extends StatelessWidget {
         TextStyle(fontWeight: FontWeight.bold, fontSize: vpH * 0.025);
 
     return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) {
-            return RestaurantScreen(restaurant: restaurant);
-          },
-        ));
-      },
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.all(15.0),
         child: PhysicalModel(
@@ -54,8 +49,7 @@ class RestaurantTile extends StatelessWidget {
                         borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(10),
                             topLeft: Radius.circular(10)),
-                        child: Image.asset(RestaurantAssets.authBg,
-                            fit: BoxFit.cover),
+                        child: Image.asset(restaurant.image, fit: BoxFit.cover),
                       ),
                     ),
                   ),
@@ -77,15 +71,7 @@ class RestaurantTile extends StatelessWidget {
                           restaurant.time,
                           maxLines: 3,
                           overflow: TextOverflow.ellipsis,
-                          // overflow: TextOverflow.ellipsis,
                         ),
-                        // const Padding(
-                        //   padding: EdgeInsets.only(top: 8.0),
-                        //   child: Text(
-                        //     "AMURoboclub",
-                        //     overflow: TextOverflow.ellipsis,
-                        //   ),
-                        // ),
                       ],
                     ),
                   ),

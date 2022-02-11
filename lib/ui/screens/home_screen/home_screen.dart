@@ -3,7 +3,9 @@ import 'dart:developer';
 import 'package:client/data/models/restaurant.dart';
 import 'package:client/logic/cubit/restaurant_cubit.dart';
 import 'package:client/ui/common_widgets/shimmer/loading_screen.dart';
+import 'package:client/ui/screens/home_screen/components/restaurant_card.dart';
 import 'package:client/ui/screens/home_screen/components/restaurant_tile.dart';
+import 'package:client/ui/screens/restaurant_screen/restaurant_screen.dart';
 import 'package:client/utils/dimensions.dart';
 import 'package:client/utils/text_theme.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +24,10 @@ class _HomeScreenState extends State<HomeScreen> {
   ValueNotifier<bool> searchError = ValueNotifier(false);
   ValueNotifier<bool> showFloatingActionButton = ValueNotifier(false);
   List<Restaurant> allRestaurants = [];
+  ValueNotifier<List<Restaurant>> recentSearchedRestaurantsList =
+      ValueNotifier([]);
   final ScrollController _scrollController = ScrollController();
+  final TextEditingController _searchTextController = TextEditingController();
 
   @override
   void initState() {
@@ -44,14 +49,12 @@ class _HomeScreenState extends State<HomeScreen> {
     searchError.dispose();
     showFloatingActionButton.dispose();
     _scrollController.dispose();
+    recentSearchedRestaurantsList.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    double height = getDeviceHeight(context);
-    double width = getDeviceWidth(context);
-    Widget spacer = const SizedBox(height: 16);
     return Scaffold(
       floatingActionButton: ValueListenableBuilder(
           valueListenable: showFloatingActionButton,
@@ -69,64 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
             return const SizedBox();
           }),
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        physics: const BouncingScrollPhysics(),
-        child: BlocBuilder<RestaurantCubit, RestaurantState>(
-          builder: (context, state) {
-            log('Restaurant Screen State Rebuild');
-            if ((state is RestaurantLoaded) ||
-                (state is RestaurantFilterApplied)) {
-              List<Restaurant> restaurantsList = [];
-              if (state is RestaurantLoaded) {
-                restaurantsList = state.restaurantsList;
-                allRestaurants = restaurantsList;
-              }
-              if (state is RestaurantFilterApplied) {
-                restaurantsList = state.filteredRestaurantsList;
-              }
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 50),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          'Search',
-                          style: kTitle0.copyWith(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                      spacer,
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: searchWidget(width),
-                      ),
-                      spacer,
-                      (state is RestaurantLoaded)
-                          ? Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16.0),
-                              child: Text(
-                                'Restaurants around you',
-                                style: kTitle2.copyWith(
-                                    fontWeight: FontWeight.bold),
-                              ),
-                            )
-                          : spacer,
-                      (state is RestaurantFilterApplied)
-                          ? clearFilter()
-                          : const SizedBox(),
-                      restaurantListView(restaurantsList)
-                    ]),
-              );
-            } else {
-              return const LoadingScreen();
-            }
-          },
-        ),
-      ),
+      body: homeBody(),
     );
   }
 
@@ -136,6 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ValueListenableBuilder(
         valueListenable: searchError,
         builder: (context, value, child) => TextField(
+          controller: _searchTextController,
           maxLines: null,
           textInputAction: TextInputAction.search,
           decoration: InputDecoration(
@@ -189,7 +136,19 @@ class _HomeScreenState extends State<HomeScreen> {
         primary: false,
         itemBuilder: (context, index) {
           Restaurant restaurant = restaurantsList[index];
-          return RestaurantTile(restaurant: restaurant);
+          return RestaurantTile(
+            restaurant: restaurant,
+            onTap: () {
+              recentSearchedRestaurantsList.value =
+                  List.from(recentSearchedRestaurantsList.value)
+                    ..add(restaurant);
+              Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) {
+                  return RestaurantScreen(restaurant: restaurant);
+                },
+              ));
+            },
+          );
         },
       ),
     );
@@ -199,7 +158,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return Center(
       child: GestureDetector(
         onTap: () {
-          BlocProvider.of<RestaurantCubit>(context).resetFilter(allRestaurants);
+          BlocProvider.of<RestaurantCubit>(context)
+              .resetFilter(allRestaurants, recentSearchedRestaurantsList.value);
+          _searchTextController.text = '';
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
@@ -218,6 +179,109 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget homeBody() {
+    double height = getDeviceHeight(context);
+    double width = getDeviceWidth(context);
+    Widget spacer = const SizedBox(height: 16);
+    return SingleChildScrollView(
+      controller: _scrollController,
+      physics: const BouncingScrollPhysics(),
+      child: BlocBuilder<RestaurantCubit, RestaurantState>(
+        builder: (context, state) {
+          log('Restaurant Screen State Rebuild');
+          if ((state is RestaurantLoaded) ||
+              (state is RestaurantFilterApplied)) {
+            List<Restaurant> restaurantsList = [];
+            if (state is RestaurantLoaded) {
+              restaurantsList = state.restaurantsList;
+              allRestaurants = restaurantsList;
+            }
+            if (state is RestaurantFilterApplied) {
+              restaurantsList = state.filteredRestaurantsList;
+            }
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 50),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Text(
+                        'Search',
+                        style: kTitle0.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    spacer,
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: searchWidget(width),
+                    ),
+                    spacer,
+                    (recentSearchedRestaurantsList.value.isNotEmpty)
+                        ? Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Text(
+                              'Recent Searches',
+                              style:
+                                  kTitle2.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        : spacer,
+                    ValueListenableBuilder(
+                      valueListenable: recentSearchedRestaurantsList,
+                      builder: (context, value, child) {
+                        if (recentSearchedRestaurantsList.value.isNotEmpty) {
+                          return recentSearchListView(height, width);
+                        } else {
+                          return const SizedBox();
+                        }
+                      },
+                    ),
+                    (state is RestaurantLoaded)
+                        ? Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Text(
+                              'Restaurants around you',
+                              style:
+                                  kTitle2.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        : spacer,
+                    (state is RestaurantFilterApplied)
+                        ? clearFilter()
+                        : const SizedBox(),
+                    restaurantListView(restaurantsList)
+                  ]),
+            );
+          } else {
+            return const LoadingScreen();
+          }
+        },
+      ),
+    );
+  }
+
+  Widget recentSearchListView(double height, double width) {
+    return SizedBox(
+      height: height * 0.25,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        shrinkWrap: true,
+        itemCount: recentSearchedRestaurantsList.value.length,
+        itemBuilder: (context, index) {
+          Restaurant restaurant = recentSearchedRestaurantsList.value[index];
+          return RestaurantCard(
+            restaurant: restaurant,
+            onTap: () {},
+          );
+        },
       ),
     );
   }
