@@ -29,24 +29,51 @@ class CollectionApi {
     return res;
   }
 
-  Future<Response> createUserCollection(Collection collection) async {
+  Future<Response> createUserCollection(
+      Collection collection, String userId) async {
     String url = "/collection";
+    dynamic data = {
+      "name": collection.name,
+      "user": userId,
+      "restaurants": collection.restaurants
+    };
     Response res;
     try {
-      res = await _client.dio.post(BASE_URL + url, data: collection.toJson());
-      log(res.toString(), name: 'Filter day res:');
+      res = await _client.dio.post(BASE_URL + url, data: data);
+      log(res.toString(), name: 'Create Collection day res:');
     } catch (err) {
       throw Exception(err);
     }
     return res;
   }
 
-  Future<Response> addRestaurantToCollection(Restaurant restaurant) async {
+  Future<Response> updateCollection(
+      Collection updatedCollection, String userId) async {
     String url = "/collection";
+    dynamic data = {
+      "user": userId,
+      "_id": updatedCollection.id,
+      "name": updatedCollection.name,
+      "restaurants": updatedCollection.restaurants
+    };
     Response res;
     try {
-      res = await _client.dio.put(BASE_URL + url, data: restaurant.toJson());
-      log(res.toString(), name: 'Filter day res:');
+      res = await _client.dio.put(BASE_URL + url, data: data);
+      log(res.toString(), name: 'Add restaurant to collection res:');
+    } catch (err) {
+      throw Exception(err);
+    }
+    return res;
+  }
+
+  Future<Response> addRestaurantToCollection(
+      Restaurant restaurant, String collectionId) async {
+    String url = "/collection/addRestaurant";
+    dynamic data = {"restaurant": restaurant.id, "id": collectionId};
+    Response res;
+    try {
+      res = await _client.dio.put(BASE_URL + url, data: data);
+      log(res.toString(), name: 'Add restaurant to collection res:');
     } catch (err) {
       throw Exception(err);
     }

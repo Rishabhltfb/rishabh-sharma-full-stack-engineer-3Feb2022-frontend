@@ -23,14 +23,28 @@ class CollectionRepository {
     return collectionList;
   }
 
-  Future<Collection> createUserCollection(Collection collection) async {
-    Response res = await _collectionApi.createUserCollection(collection);
+  Future<Collection> createUserCollection(
+      Collection collection, String userId) async {
+    Response res =
+        await _collectionApi.createUserCollection(collection, userId);
     dynamic data = res.data['data'];
     return Collection.fromMap(data);
   }
 
-  Future<bool> addRestaurantToCollection(Restaurant restaurant) async {
-    Response res = await _collectionApi.addRestaurantToCollection(restaurant);
+  Future<bool> updateCollection(
+      Collection updatedCollection, String userId) async {
+    Response res =
+        await _collectionApi.updateCollection(updatedCollection, userId);
+    if (res.statusCode == 200) {
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> addRestaurantToCollection(
+      Restaurant restaurant, String collectionId) async {
+    Response res = await _collectionApi.addRestaurantToCollection(
+        restaurant, collectionId);
     if (res.statusCode == 200) {
       return true;
     }

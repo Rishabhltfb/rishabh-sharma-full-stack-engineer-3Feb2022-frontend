@@ -34,6 +34,7 @@ class TokenService {
   }
 
   bool isTokenExpired(String _token) {
+    if (_token.isEmpty) return true;
     try {
       DateTime? expiryDate = Jwt.getExpiryDate(_token);
       if (expiryDate != null) {
