@@ -40,6 +40,7 @@ class RestaurantCubit extends Cubit<RestaurantState> {
 
   Future<List<Restaurant>> filterByRestaurantName(String name) async {
     try {
+      emit(const RestaurantLoading());
       List<Restaurant> filteredRestaurantsList =
           await _filterRepository.filterByRestaurantName(name);
       emit(RestaurantFilterApplied(filteredRestaurantsList));
@@ -54,6 +55,7 @@ class RestaurantCubit extends Cubit<RestaurantState> {
   Future<List<Restaurant>> filterByDayTime(
       String day, int startTime, int endTime) async {
     try {
+      emit(const RestaurantLoading());
       List<Restaurant> filteredRestaurantsList =
           await _filterRepository.filterByDayTime(day, startTime, endTime);
       emit(RestaurantFilterApplied(filteredRestaurantsList));

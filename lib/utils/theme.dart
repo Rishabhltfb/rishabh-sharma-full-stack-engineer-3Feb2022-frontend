@@ -18,6 +18,7 @@ final ThemeData theme = ThemeData(
   elevatedButtonTheme: ElevatedButtonThemeData(style: getButtonStyle()),
   buttonTheme: const ButtonThemeData(
     buttonColor: color3,
+    textTheme: ButtonTextTheme.normal,
     disabledColor: Colors.grey,
     splashColor: Colors.white,
   ),

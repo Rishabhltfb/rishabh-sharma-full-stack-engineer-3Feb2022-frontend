@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:client/data/models/dummy_data.dart';
 import 'package:client/logic/cubit/restaurant_cubit.dart';
 import 'package:client/utils/dimensions.dart';
 import 'package:flutter/material.dart';
@@ -33,20 +34,21 @@ class SearchWidget extends StatelessWidget {
                 searchError.value ? 'Search length should be  > 3' : null,
             icon: const Icon(Icons.search),
             suffixIcon: IconButton(
-                onPressed: () {
-                  showCustomTimePicker(
-                      context: context,
-                      cancelText: 'Cancel',
-                      confirmText: 'Next',
-                      helpText: 'Pick Schedule time',
-                      onFailValidation: (context) =>
-                          log('Unavailable selection'),
-                      initialTime: TimeOfDay(hour: 0, minute: 0),
-                      selectableTimePredicate: (time) => true).then((time) {
-                    if (time != null) {
-                      int selectedTime = time.hour * 100 + time.minute;
+                onPressed: () async {
+                  int day = await getDay(context);
+                  if (day != -1) {
+                    int startTime =
+                        await timePicker(context, 'Pick Starting time');
+                    if (startTime != -1) {
+                      int endTime =
+                          await timePicker(context, 'Pick Ending time');
+                      if (endTime != -1) {
+                        BlocProvider.of<RestaurantCubit>(context)
+                            .filterByDayTime(DummyData().weekdays[day - 1],
+                                startTime, endTime);
+                      }
                     }
-                  });
+                  }
                 },
                 icon: const Icon(Icons.calendar_today_outlined)),
             hintText: "Restaurant search eg. Osakaya Restaurant",
@@ -82,5 +84,62 @@ class SearchWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<int> getDay(BuildContext context) async {
+    DateTime? day = await showDatePicker(
+      context: context,
+      helpText: 'Pick Dining Date',
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 60)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                primary: Colors.red, // button text color
+              ),
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (day != null) {
+      return day.weekday;
+    } else {
+      return -1;
+    }
+  }
+
+  Future<int> timePicker(BuildContext context, String helpText) async {
+    TimeOfDay? time = await showCustomTimePicker(
+        context: context,
+        cancelText: 'Cancel',
+        confirmText: 'Next',
+        helpText: helpText,
+        builder: (context, child) {
+          return Theme(
+            data: Theme.of(context).copyWith(
+              textButtonTheme: TextButtonThemeData(
+                style: TextButton.styleFrom(
+                  primary: Colors.red, // button text color
+                ),
+              ),
+            ),
+            child: child!,
+          );
+        },
+        onFailValidation: (context) => log('Unavailable selection'),
+        initialTime: const TimeOfDay(hour: 0, minute: 0),
+        selectableTimePredicate: (time) => true);
+    if (time != null) {
+      int selectedTime = time.hour * 100 + time.minute;
+      return selectedTime;
+    } else {
+      return -1;
+    }
   }
 }
