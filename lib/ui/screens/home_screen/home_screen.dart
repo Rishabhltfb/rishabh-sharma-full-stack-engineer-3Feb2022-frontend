@@ -3,7 +3,9 @@ import 'dart:developer';
 import 'package:client/data/models/restaurant.dart';
 import 'package:client/logic/cubit/auth_cubit.dart';
 import 'package:client/logic/cubit/restaurant_cubit.dart';
+import 'package:client/ui/common_widgets/restaurant_listview.dart';
 import 'package:client/ui/common_widgets/shimmer/loading_screen.dart';
+import 'package:client/ui/screens/collection_screen/collection_screen.dart';
 import 'package:client/ui/screens/home_screen/components/clear_filter_widget.dart';
 import 'package:client/ui/screens/home_screen/components/restaurant_card.dart';
 import 'package:client/ui/screens/home_screen/components/restaurant_tile.dart';
@@ -37,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<RestaurantCubit>(context).fetchAllRestaurants();
     _scrollController.addListener(() {
       if (_scrollController.offset > 10 && !showFloatingActionButton.value) {
         showFloatingActionButton.value = true;
@@ -81,48 +82,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget restaurantListView(List<Restaurant> restaurantsList) {
-    return Scrollbar(
-      interactive: true,
-      thickness: 10,
-      radius: const Radius.circular(10),
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: restaurantsList.length,
-        physics: const BouncingScrollPhysics(),
-        primary: false,
-        itemBuilder: (context, index) {
-          Restaurant restaurant = restaurantsList[index];
-          return RestaurantTile(
-            restaurant: restaurant,
-            onTap: () {
-              bool isFound = false;
-              for (int i = 0;
-                  i < recentSearchedRestaurantsList.value.length;
-                  i++) {
-                if (recentSearchedRestaurantsList.value[i].id ==
-                    restaurant.id) {
-                  isFound = true;
-                  break;
-                }
-              }
-              if (!isFound) {
-                recentSearchedRestaurantsList.value =
-                    List.from(recentSearchedRestaurantsList.value)
-                      ..add(restaurant);
-              }
-              Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) {
-                  return RestaurantScreen(restaurant: restaurant);
-                },
-              ));
-            },
-          );
-        },
-      ),
-    );
-  }
-
   Widget homeBody() {
     double height = getDeviceHeight(context);
     double width = getDeviceWidth(context);
@@ -163,29 +122,33 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     spacer,
-                    ValueListenableBuilder(
-                      valueListenable: recentSearchedRestaurantsList,
-                      builder: (context, value, child) {
-                        if (recentSearchedRestaurantsList.value.isNotEmpty) {
-                          return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16.0),
-                                  child: Text(
-                                    'Recent search',
-                                    style: kTitle2.copyWith(
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                                recentSearchListView(height, width)
-                              ]);
-                        } else {
-                          return const SizedBox();
-                        }
-                      },
-                    ),
+                    (state is RestaurantLoaded)
+                        ? ValueListenableBuilder(
+                            valueListenable: recentSearchedRestaurantsList,
+                            builder: (context, value, child) {
+                              if (recentSearchedRestaurantsList
+                                  .value.isNotEmpty) {
+                                return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 16.0),
+                                        child: Text(
+                                          'Recent search',
+                                          style: kTitle2.copyWith(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      recentSearchListView(height, width)
+                                    ]);
+                              } else {
+                                return const SizedBox();
+                              }
+                            },
+                          )
+                        : const SizedBox(),
                     (state is RestaurantLoaded)
                         ? Padding(
                             padding:
@@ -205,7 +168,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             _searchTextController.text = '';
                           })
                         : const SizedBox(),
-                    restaurantListView(restaurantsList)
+                    RestaurantListView(
+                        restaurantsList: restaurantsList,
+                        recentSearchedRestaurantsList:
+                            recentSearchedRestaurantsList)
                   ]),
             );
           } else {
@@ -250,19 +216,43 @@ class _HomeScreenState extends State<HomeScreen> {
             'Search',
             style: kTitle0.copyWith(fontWeight: FontWeight.bold),
           ),
-          GestureDetector(
-            onTap: () {
-              BlocProvider.of<AuthCubit>(context).logoutUser();
-              // Navigator.pushNamed(context, ProfileScreen.route);
-            },
-            child: const CircleAvatar(
-              backgroundColor: Colors.black,
-              radius: 18,
-              child: Icon(
-                Icons.logout,
-                color: Colors.white,
+          Row(
+            children: [
+              OutlinedButton(
+                  onPressed: () =>
+                      Navigator.pushNamed(context, CollectionScreen.route),
+                  child: Text(
+                    'My Collection',
+                    style: kBody1.copyWith(fontWeight: FontWeight.bold),
+                  )),
+              // GestureDetector(
+              //   onTap: () {
+
+              //   },
+              //   child: const CircleAvatar(
+              //     backgroundColor: Colors.black,
+              //     radius: 18,
+              //     child: Icon(
+              //       Icons.favorite_rounded,
+              //       color: Colors.white,
+              //     ),
+              //   ),
+              // ),
+              const SizedBox(width: 10),
+              GestureDetector(
+                onTap: () {
+                  BlocProvider.of<AuthCubit>(context).logoutUser();
+                },
+                child: const CircleAvatar(
+                  backgroundColor: Colors.black,
+                  radius: 18,
+                  child: Icon(
+                    Icons.logout,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),

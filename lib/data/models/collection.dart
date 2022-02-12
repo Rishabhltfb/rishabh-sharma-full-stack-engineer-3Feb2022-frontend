@@ -7,22 +7,22 @@ import 'package:client/data/models/restaurant.dart';
 class Collection {
   String id;
   String name;
-  List<Restaurant> restautants;
+  List<Restaurant> restaurants;
   Collection({
     required this.id,
     required this.name,
-    required this.restautants,
+    required this.restaurants,
   });
 
   Collection copyWith({
     String? id,
     String? name,
-    List<Restaurant>? restautants,
+    List<Restaurant>? restaurants,
   }) {
     return Collection(
       id: id ?? this.id,
       name: name ?? this.name,
-      restautants: restautants ?? this.restautants,
+      restaurants: restaurants ?? this.restaurants,
     );
   }
 
@@ -30,7 +30,7 @@ class Collection {
     return {
       'id': id,
       'name': name,
-      'restautants': restautants.map((x) => x.toMap()).toList(),
+      'restaurants': restaurants.map((x) => x.toMap()).toList(),
     };
   }
 
@@ -38,8 +38,8 @@ class Collection {
     return Collection(
       id: map['_id'] ?? '',
       name: map['name'] ?? '',
-      restautants: List<Restaurant>.from(
-          map['restautants']?.map((x) => Restaurant.fromMap(x))),
+      restaurants: List<Restaurant>.from(
+          map['restaurants']?.map((x) => Restaurant.fromMap(x))),
     );
   }
 
@@ -50,7 +50,7 @@ class Collection {
 
   @override
   String toString() =>
-      'Collection(id: $id, name: $name, restautants: $restautants)';
+      'Collection(id: $id, name: $name, restaurants: $restaurants)';
 
   @override
   bool operator ==(Object other) {
@@ -59,9 +59,9 @@ class Collection {
     return other is Collection &&
         other.id == id &&
         other.name == name &&
-        listEquals(other.restautants, restautants);
+        listEquals(other.restaurants, restaurants);
   }
 
   @override
-  int get hashCode => id.hashCode ^ name.hashCode ^ restautants.hashCode;
+  int get hashCode => id.hashCode ^ name.hashCode ^ restaurants.hashCode;
 }

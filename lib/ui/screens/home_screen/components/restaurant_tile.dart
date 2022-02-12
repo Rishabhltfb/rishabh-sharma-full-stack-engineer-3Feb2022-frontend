@@ -32,7 +32,7 @@ class RestaurantTile extends StatelessWidget {
             Radius.circular(10),
           ),
           child: Container(
-            height: vpH * 0.15,
+            // height: vpH * 0.16,
             width: vpW * 0.85,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
@@ -45,7 +45,7 @@ class RestaurantTile extends StatelessWidget {
                   child: Hero(
                     tag: restaurant.id ?? restaurant.restaurantName,
                     child: Container(
-                      height: vpH * 0.15,
+                      height: vpH * 0.16,
                       width: vpW * 0.3,
                       decoration: const BoxDecoration(
                         color: Colors.white,
@@ -69,6 +69,7 @@ class RestaurantTile extends StatelessWidget {
                     margin: const EdgeInsets.all(10),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(
                           restaurant.restaurantName,
