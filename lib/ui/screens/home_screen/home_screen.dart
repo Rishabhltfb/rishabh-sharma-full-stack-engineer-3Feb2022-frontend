@@ -188,6 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         shrinkWrap: true,
+        physics: const BouncingScrollPhysics(),
         itemCount: recentSearchedRestaurantsList.value.length,
         itemBuilder: (context, index) {
           Restaurant restaurant = recentSearchedRestaurantsList.value[index];

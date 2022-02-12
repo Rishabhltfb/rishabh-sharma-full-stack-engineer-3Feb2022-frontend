@@ -18,6 +18,7 @@ class RestaurantScreen extends StatefulWidget {
 
 class _RestaurantScreenState extends State<RestaurantScreen> {
   ValueNotifier<bool> isFav = ValueNotifier(false);
+  late CollectionCubit collectionCubit;
 
   @override
   void initState() {
@@ -74,7 +75,10 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
                       IconButton(
                           onPressed: () {
                             if (isFav.value) {
-                            } else {}
+                            } else {
+                              // collection
+                            }
+                            isFav.value = !isFav.value;
                           },
                           icon: isFav.value
                               ? const Icon(Icons.favorite, color: Colors.white)
