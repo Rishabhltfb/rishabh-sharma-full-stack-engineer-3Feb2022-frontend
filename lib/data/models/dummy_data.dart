@@ -1,4 +1,6 @@
+import 'package:client/data/enums/enum.dart';
 import 'package:client/utils/assets.dart';
+import 'package:flutter/material.dart';
 
 class DummyData {
   List<Map<String, String>> cussineList = [
@@ -20,5 +22,22 @@ class DummyData {
     RestaurantAssets.restaurant7,
     RestaurantAssets.restaurant8,
     RestaurantAssets.restaurant9,
+  ];
+  List<Color> colorList = [
+    Colors.red,
+    Colors.yellow,
+    Colors.orange,
+    Colors.purple,
+    Colors.green,
+    Colors.blue,
+  ];
+  List<String> weekdays = [
+    Weekdays.Mon.name,
+    Weekdays.Tues.name,
+    Weekdays.Wed.name,
+    Weekdays.Thu.name,
+    Weekdays.Fri.name,
+    Weekdays.Sat.name,
+    Weekdays.Sun.name,
   ];
 }

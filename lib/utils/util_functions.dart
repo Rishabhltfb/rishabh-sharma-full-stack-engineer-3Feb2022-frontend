@@ -13,4 +13,8 @@ class UtilFunctions {
 
   static int getRandomNumber(int min, int max) =>
       min + Random().nextInt(max - min);
+
+  static bool openOnDay(int openingTime, int closingTime) {
+    return (openingTime != -1 && closingTime != -1);
+  }
 }

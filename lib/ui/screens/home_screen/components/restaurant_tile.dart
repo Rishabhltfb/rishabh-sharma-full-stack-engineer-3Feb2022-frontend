@@ -1,5 +1,9 @@
+import 'package:client/data/models/dummy_data.dart';
 import 'package:client/data/models/restaurant.dart';
+import 'package:client/ui/common_widgets/chips.dart';
 import 'package:client/utils/dimensions.dart';
+import 'package:client/utils/text_theme.dart';
+import 'package:client/utils/util_functions.dart';
 import 'package:flutter/material.dart';
 
 class RestaurantTile extends StatelessWidget {
@@ -13,9 +17,10 @@ class RestaurantTile extends StatelessWidget {
   Widget build(BuildContext context) {
     var vpH = getViewportHeight(context);
     var vpW = getViewportWidth(context);
+    SizedBox spacer = const SizedBox(height: 6);
     TextStyle _titlestyle =
         TextStyle(fontWeight: FontWeight.bold, fontSize: vpH * 0.025);
-
+    List<String> weekdays = DummyData().weekdays;
     return GestureDetector(
       onTap: onTap,
       child: Padding(
@@ -70,11 +75,21 @@ class RestaurantTile extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           style: _titlestyle,
                         ),
-                        Text(
-                          restaurant.time,
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        spacer,
+                        Wrap(
+                          children: [
+                            for (int i = 0; i < weekdays.length; i++)
+                              (UtilFunctions.openOnDay(
+                                      restaurant.schedule![weekdays[i]]
+                                          ['openingTime'],
+                                      restaurant.schedule![weekdays[i]]
+                                          ['closingTime'])
+                                  ? Chips(text: weekdays[i])
+                                  : const SizedBox())
+                          ],
+                          spacing: 6,
+                          runSpacing: 6,
+                        )
                       ],
                     ),
                   ),
