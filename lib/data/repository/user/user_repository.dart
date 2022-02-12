@@ -13,9 +13,9 @@ class UserRepository {
     return instance;
   }
 
-  Future<User> getUserById() async {
-    Response res = await _userApi.getUserById();
-    dynamic data = jsonDecode(res.data['data']);
+  Future<User> getUser() async {
+    Response res = await _userApi.getUser();
+    dynamic data = res.data['data'];
     return User.fromMap(data);
   }
 }

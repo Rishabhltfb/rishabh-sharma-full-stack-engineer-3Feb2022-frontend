@@ -13,12 +13,11 @@ class UserApi {
 
   final DioClient _client = DioClient();
 
-  Future<Response> getUserById() async {
+  Future<Response> getUser() async {
     String url = "/user";
     Response res;
     try {
       res = await _client.dio.get(BASE_URL + url);
-      // log(res.toString(), name: 'User res:');
     } catch (err) {
       throw Exception(err);
     }

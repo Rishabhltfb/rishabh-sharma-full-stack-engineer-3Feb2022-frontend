@@ -2,6 +2,9 @@ import 'dart:developer';
 
 import 'package:client/data/models/auth_body.dart';
 import 'package:client/logic/cubit/auth_cubit.dart';
+import 'package:client/logic/cubit/collection_cubit.dart';
+import 'package:client/logic/cubit/restaurant_cubit.dart';
+import 'package:client/logic/cubit/user_cubit.dart';
 import 'package:client/ui/common_widgets/custom_button.dart';
 import 'package:client/ui/screens/home_screen/home_screen.dart';
 import 'package:client/utils/assets.dart';
@@ -23,6 +26,20 @@ class _AuthScreenState extends State<AuthScreen> {
   final ValueNotifier<bool> _passwordValidated = ValueNotifier(false);
   final ValueNotifier<String> email = ValueNotifier('');
   final ValueNotifier<String> password = ValueNotifier('');
+  late AuthCubit authCubit;
+  late CollectionCubit collectionCubit;
+  late UserCubit userCubit;
+  late RestaurantCubit restaurantCubit;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    authCubit = BlocProvider.of<AuthCubit>(context);
+    collectionCubit = BlocProvider.of<CollectionCubit>(context);
+    userCubit = BlocProvider.of<UserCubit>(context);
+    restaurantCubit = BlocProvider.of<RestaurantCubit>(context);
+  }
 
   @override
   void dispose() {
@@ -70,27 +87,42 @@ class _AuthScreenState extends State<AuthScreen> {
               style: kTitle2.copyWith(color: Colors.white),
             ),
             SizedBox(height: height * 0.2),
-            SizedBox(
-              width: width * 0.75,
-              child: createTextField(
-                  'Email Address', 'Please enter your email', '',
-                  onChanged: (String value) {
-                email.value = value;
-              }),
+            ValueListenableBuilder(
+              valueListenable: _emailValidated,
+              builder: (context, value, child) => SizedBox(
+                width: width * 0.8,
+                child: createTextField(
+                    'Email Address', 'Please enter your email', '',
+                    onChanged: (String value) {
+                  email.value = value;
+                }),
+              ),
             ),
             spacer,
             spacer,
-            SizedBox(
-              width: width * 0.75,
-              child: createTextField(
-                'Password',
-                'Please enter password',
-                '',
-                onChanged: (String value) {
-                  password.value = value;
-                },
-                error: false,
+            ValueListenableBuilder(
+              valueListenable: _passwordValidated,
+              builder: (context, value, child) => SizedBox(
+                width: width * 0.8,
+                child: createTextField(
+                  'Password',
+                  'Please enter password',
+                  '',
+                  onChanged: (String value) {
+                    password.value = value;
+                  },
+                ),
               ),
+            ),
+            ValueListenableBuilder(
+              valueListenable: _passwordValidated,
+              builder: (context, value, child) => _passwordValidated.value
+                  ? Text(
+                      'Invalid Credentials',
+                      textAlign: TextAlign.left,
+                      style: kBody1.copyWith(color: Colors.red),
+                    )
+                  : const SizedBox(),
             ),
             spacer,
             spacer,
@@ -129,7 +161,7 @@ class _AuthScreenState extends State<AuthScreen> {
       height: height,
       width: width,
       child: Image.asset(
-        RestaurantAssets.authBg,
+        RestaurantAssets.authBg3,
         fit: BoxFit.fitHeight,
       ),
     );
@@ -234,19 +266,24 @@ class _AuthScreenState extends State<AuthScreen> {
   void submit() async {
     {
       log('Inside submit function');
-      _emailValidated.value = email.value.isNotEmpty;
-      _passwordValidated.value = password.value.isNotEmpty;
-      if (_emailValidated.value && _passwordValidated.value) {
+      if (email.value.isNotEmpty && password.value.isNotEmpty) {
         AuthBody authBody =
             AuthBody(email: email.value, password: password.value);
-        bool success =
-            await BlocProvider.of<AuthCubit>(context).signIn(authBody);
+        bool success = await authCubit.signIn(authBody);
         if (success) {
+          Future.wait([
+            restaurantCubit.fetchAllRestaurants(),
+            userCubit.getUser(),
+            collectionCubit.getUserCollections(),
+          ]);
           Navigator.pushReplacementNamed(context, HomeScreen.route);
         } else {
           _passwordValidated.value = false;
           _emailValidated.value = false;
         }
+      } else {
+        _passwordValidated.value = false;
+        _emailValidated.value = false;
       }
     }
   }

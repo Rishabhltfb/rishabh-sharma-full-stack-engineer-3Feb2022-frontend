@@ -1,4 +1,5 @@
 import 'package:client/ui/screens/auth_screen/auth_screen.dart';
+import 'package:client/ui/screens/collection_screen/collection_screen.dart';
 import 'package:client/ui/screens/home_screen/home_screen.dart';
 import 'package:client/ui/screens/profile_screen/profile_screen.dart';
 import 'package:client/ui/screens/splash_screen/splash_screen.dart';
@@ -22,6 +23,10 @@ class Router {
       case ProfileScreen.route:
         return MaterialPageRoute(
           builder: (context) => const ProfileScreen(),
+        );
+      case CollectionScreen.route:
+        return MaterialPageRoute(
+          builder: (context) => const CollectionScreen(),
         );
       default:
         return MaterialPageRoute(
