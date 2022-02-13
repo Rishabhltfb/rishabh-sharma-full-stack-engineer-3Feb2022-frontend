@@ -20,7 +20,8 @@ class RestaurantAssets {
   static const String restaurant9 = 'assets/images/restaurant9.jpg';
 
   /// [Icons]
-  // static const String shimmerBg = 'assets/icons/shimmerBg.svg';
+  static const String error = 'assets/icons/404_error.svg';
+  static const String noData = 'assets/icons/no_data.svg';
   static const String splashLottieIcon =
       'https://assets6.lottiefiles.com/private_files/lf30_i83aodu2.json';
 

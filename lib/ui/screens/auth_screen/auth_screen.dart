@@ -23,8 +23,7 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final ValueNotifier<bool> _emailValidated = ValueNotifier(false);
-  final ValueNotifier<bool> _passwordValidated = ValueNotifier(false);
+  final ValueNotifier<bool> _passwordError = ValueNotifier(false);
   final ValueNotifier<bool> isLoading = ValueNotifier(false);
   final ValueNotifier<String> email = ValueNotifier('');
   final ValueNotifier<String> password = ValueNotifier('');
@@ -45,8 +44,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   void dispose() {
-    _emailValidated.dispose();
-    _passwordValidated.dispose();
+    _passwordError.dispose();
     email.dispose();
     isLoading.dispose();
     password.dispose();
@@ -92,17 +90,14 @@ class _AuthScreenState extends State<AuthScreen> {
               style: kTitle2.copyWith(color: Colors.white),
             ),
             SizedBox(height: height * 0.2),
-            ValueListenableBuilder(
-              valueListenable: _emailValidated,
-              builder: (context, value, child) => SizedBox(
-                width: width * 0.8,
-                child: AuthTextField(
-                    title: 'Email Address',
-                    hintText: 'Please enter your email',
-                    onChanged: (String value) {
-                      email.value = value;
-                    }),
-              ),
+            SizedBox(
+              width: width * 0.8,
+              child: AuthTextField(
+                  title: 'Email Address',
+                  hintText: 'Please enter your email',
+                  onChanged: (String value) {
+                    email.value = value;
+                  }),
             ),
             spacer,
             spacer,
@@ -117,8 +112,8 @@ class _AuthScreenState extends State<AuthScreen> {
               ),
             ),
             ValueListenableBuilder(
-              valueListenable: _passwordValidated,
-              builder: (context, value, child) => !_passwordValidated.value
+              valueListenable: _passwordError,
+              builder: (context, value, child) => _passwordError.value
                   ? Text(
                       'Invalid Credentials',
                       textAlign: TextAlign.left,
@@ -197,8 +192,7 @@ class _AuthScreenState extends State<AuthScreen> {
       log('Submit button');
       isLoading.value = true;
       if (email.value.isNotEmpty && password.value.isNotEmpty) {
-        _emailValidated.value = true;
-        _passwordValidated.value = true;
+        _passwordError.value = false;
         AuthBody authBody =
             AuthBody(email: email.value, password: password.value);
         bool success = await authCubit.signIn(authBody);
@@ -210,16 +204,10 @@ class _AuthScreenState extends State<AuthScreen> {
           ]);
           isLoading.value = false;
           Navigator.pushReplacementNamed(context, HomeScreen.route);
-        } else {
-          log('Here');
-          _passwordValidated.value = false;
-          _emailValidated.value = false;
         }
-      } else {
-        _passwordValidated.value = false;
-        _emailValidated.value = false;
-        isLoading.value = false;
       }
+      _passwordError.value = true;
+      isLoading.value = false;
     }
   }
 }

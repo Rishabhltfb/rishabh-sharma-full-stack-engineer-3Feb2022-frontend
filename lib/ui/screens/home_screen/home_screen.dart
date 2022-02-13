@@ -3,16 +3,15 @@ import 'dart:developer';
 import 'package:client/data/models/restaurant.dart';
 import 'package:client/logic/cubit/auth_cubit.dart';
 import 'package:client/logic/cubit/restaurant_cubit.dart';
+import 'package:client/ui/common_widgets/message_widget.dart';
 import 'package:client/ui/common_widgets/restaurant_listview.dart';
 import 'package:client/ui/common_widgets/shimmer/loading_screen.dart';
 import 'package:client/ui/screens/collection_screen/collection_screen.dart';
 import 'package:client/ui/screens/home_screen/components/clear_filter_widget.dart';
 import 'package:client/ui/screens/home_screen/components/restaurant_card.dart';
-import 'package:client/ui/screens/home_screen/components/restaurant_tile.dart';
 import 'package:client/ui/screens/home_screen/components/search_widget.dart';
-import 'package:client/ui/screens/profile_screen/profile_screen.dart';
 import 'package:client/ui/screens/restaurant_screen/restaurant_screen.dart';
-import 'package:client/utils/color_pallet.dart';
+import 'package:client/utils/assets.dart';
 import 'package:client/utils/dimensions.dart';
 import 'package:client/utils/text_theme.dart';
 import 'package:flutter/material.dart';
@@ -63,17 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   @override
-  void dispose() {
-    restaurantSearch.dispose();
-    searchError.dispose();
-    showFloatingActionButton.dispose();
-    _scrollController.dispose();
-    listLoading.dispose();
-    recentSearchedRestaurantsList.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     double height = getDeviceHeight(context);
     double width = getDeviceWidth(context);
@@ -102,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: BlocBuilder<RestaurantCubit, RestaurantState>(
             builder: (context, state) {
               log('State Chnaged: $state');
+
               if ((state is RestaurantLoaded) ||
                   (state is RestaurantFilterApplied)) {
                 List<Restaurant> restaurantsList = [];
@@ -189,8 +178,24 @@ class _HomeScreenState extends State<HomeScreen> {
                         )
                       ]),
                 );
+              } else if (state is RestaurantError) {
+                return Column(
+                  children: [
+                    SizedBox(height: height * 0.1),
+                    MessageWidget(
+                      height: height * 0.35,
+                      svgPicture: RestaurantAssets.error,
+                      message: 'Oops!',
+                    ),
+                  ],
+                );
               } else {
-                return const LoadingScreen();
+                return Column(children: [
+                  spacer,
+                  spacer,
+                  headerWidget(),
+                  const LoadingScreen()
+                ]);
               }
             },
           ),
@@ -243,19 +248,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     'My Collection',
                     style: kBody1.copyWith(fontWeight: FontWeight.bold),
                   )),
-              // GestureDetector(
-              //   onTap: () {
-
-              //   },
-              //   child: const CircleAvatar(
-              //     backgroundColor: Colors.black,
-              //     radius: 18,
-              //     child: Icon(
-              //       Icons.favorite_rounded,
-              //       color: Colors.white,
-              //     ),
-              //   ),
-              // ),
               const SizedBox(width: 10),
               GestureDetector(
                 onTap: () {
@@ -284,5 +276,16 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_scrollController.offset < 10 && showFloatingActionButton.value) {
       showFloatingActionButton.value = false;
     }
+  }
+
+  @override
+  void dispose() {
+    restaurantSearch.dispose();
+    searchError.dispose();
+    showFloatingActionButton.dispose();
+    _scrollController.dispose();
+    listLoading.dispose();
+    recentSearchedRestaurantsList.dispose();
+    super.dispose();
   }
 }
