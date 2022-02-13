@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:client/constants/api_constants.dart';
 import 'package:client/constants/api_routes.dart';
 import 'package:client/data/api/dio_client.dart';
 import 'package:client/data/models/restaurant.dart';
@@ -16,11 +17,13 @@ class RestaurantApi {
 
   final DioClient _client = DioClient();
 
-  Future<Response> fetchAllRestaurants() async {
-    String url = "/restaurant/all";
+  Future<Response> fetchRestaurants(int page) async {
+    String url = "/restaurant";
+    var queryParameters = {"page": page, "perPage": RESTAURANTS_PER_PAGE};
     Response res;
     try {
-      res = await _client.dio.get(BASE_URL + url);
+      res = await _client.dio
+          .get(BASE_URL + url, queryParameters: queryParameters);
     } catch (err) {
       throw Exception(err);
     }

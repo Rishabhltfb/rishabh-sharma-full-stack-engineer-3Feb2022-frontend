@@ -30,23 +30,31 @@ class _HomeScreenState extends State<HomeScreen> {
   ValueNotifier<String> restaurantSearch = ValueNotifier('');
   ValueNotifier<bool> searchError = ValueNotifier(false);
   ValueNotifier<bool> showFloatingActionButton = ValueNotifier(false);
+  ValueNotifier<int> paginationPage = ValueNotifier(1);
   List<Restaurant> allRestaurants = [];
   ValueNotifier<List<Restaurant>> recentSearchedRestaurantsList =
       ValueNotifier([]);
   final ScrollController _scrollController = ScrollController();
+  late RestaurantCubit restaurantCubit;
   final TextEditingController _searchTextController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(() {
-      if (_scrollController.offset > 10 && !showFloatingActionButton.value) {
-        showFloatingActionButton.value = true;
-      }
-      if (_scrollController.offset < 10 && showFloatingActionButton.value) {
-        showFloatingActionButton.value = false;
-      }
-    });
+
+    restaurantCubit = BlocProvider.of<RestaurantCubit>(context);
+    _scrollController.addListener(showFloating);
+    _scrollController.addListener(pagination);
+  }
+
+  void pagination() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      log('Fetch Pagination data for page ${(paginationPage.value + 1).toString()}');
+      restaurantCubit.fetchRestaurants(
+          paginationPage.value + 1, recentSearchedRestaurantsList.value);
+      paginationPage.value = paginationPage.value + 1;
+    }
   }
 
   @override
@@ -61,118 +69,117 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: ValueListenableBuilder(
-          valueListenable: showFloatingActionButton,
-          builder: (context, value, child) {
-            if (showFloatingActionButton.value) {
-              return FloatingActionButton(
-                onPressed: () {
-                  _scrollController.animateTo(0.0,
-                      duration: const Duration(seconds: 1),
-                      curve: Curves.easeIn);
-                },
-                backgroundColor: Colors.black,
-                child: const Icon(Icons.arrow_upward_outlined),
-              );
-            }
-            return const SizedBox();
-          }),
-      body: homeBody(),
-    );
-  }
-
-  Widget homeBody() {
     double height = getDeviceHeight(context);
     double width = getDeviceWidth(context);
     Widget spacer = const SizedBox(height: 16);
-    return SingleChildScrollView(
-      controller: _scrollController,
-      physics: const BouncingScrollPhysics(),
-      child: BlocBuilder<RestaurantCubit, RestaurantState>(
-        builder: (context, state) {
-          if ((state is RestaurantLoaded) ||
-              (state is RestaurantFilterApplied)) {
-            List<Restaurant> restaurantsList = [];
-            if (state is RestaurantLoaded) {
-              restaurantsList = state.restaurantsList;
-              allRestaurants = restaurantsList;
-            }
-            if (state is RestaurantFilterApplied) {
-              restaurantsList = state.filteredRestaurantsList;
-            }
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 50),
-                    headerWidget(),
-                    spacer,
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                      child: SearchWidget(
-                        searchError: searchError,
-                        searchTextController: _searchTextController,
-                      ),
-                    ),
-                    spacer,
-                    (state is RestaurantLoaded)
-                        ? ValueListenableBuilder(
-                            valueListenable: recentSearchedRestaurantsList,
-                            builder: (context, value, child) {
-                              if (recentSearchedRestaurantsList
-                                  .value.isNotEmpty) {
-                                return Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16.0),
-                                        child: Text(
-                                          'Recent search',
-                                          style: kTitle2.copyWith(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                      recentSearchListView(height, width)
-                                    ]);
-                              } else {
-                                return const SizedBox();
-                              }
-                            },
-                          )
-                        : const SizedBox(),
-                    (state is RestaurantLoaded)
-                        ? Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 16.0),
-                            child: Text(
-                              'Restaurants around you',
-                              style:
-                                  kTitle2.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                          )
-                        : spacer,
-                    (state is RestaurantFilterApplied)
-                        ? ClearFilterWidget(onTap: () {
-                            BlocProvider.of<RestaurantCubit>(context)
-                                .resetFilter(allRestaurants,
+    return SafeArea(
+      child: Scaffold(
+        floatingActionButton: ValueListenableBuilder(
+            valueListenable: showFloatingActionButton,
+            builder: (context, value, child) {
+              if (showFloatingActionButton.value) {
+                return FloatingActionButton(
+                  onPressed: () {
+                    _scrollController.animateTo(0.0,
+                        duration: const Duration(seconds: 1),
+                        curve: Curves.easeIn);
+                  },
+                  backgroundColor: Colors.black,
+                  child: const Icon(Icons.arrow_upward_outlined),
+                );
+              }
+              return const SizedBox();
+            }),
+        body: SingleChildScrollView(
+          controller: _scrollController,
+          physics: const BouncingScrollPhysics(),
+          child: BlocBuilder<RestaurantCubit, RestaurantState>(
+            builder: (context, state) {
+              log('State Chnaged: $state');
+              if ((state is RestaurantLoaded) ||
+                  (state is RestaurantFilterApplied)) {
+                List<Restaurant> restaurantsList = [];
+                if (state is RestaurantLoaded) {
+                  restaurantsList = state.restaurantsList;
+                  allRestaurants = restaurantsList;
+                }
+                if (state is RestaurantFilterApplied) {
+                  restaurantsList = state.filteredRestaurantsList;
+                }
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 30),
+                        headerWidget(),
+                        spacer,
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: SearchWidget(
+                              searchError: searchError,
+                              searchTextController: _searchTextController,
+                              scaffoldContext: context),
+                        ),
+                        spacer,
+                        (state is RestaurantLoaded)
+                            ? ValueListenableBuilder(
+                                valueListenable: recentSearchedRestaurantsList,
+                                builder: (context, value, child) {
+                                  if (recentSearchedRestaurantsList
+                                      .value.isNotEmpty) {
+                                    return Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 16.0),
+                                            child: Text(
+                                              'Recent search',
+                                              style: kTitle2.copyWith(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          recentSearchListView(height, width)
+                                        ]);
+                                  } else {
+                                    return const SizedBox();
+                                  }
+                                },
+                              )
+                            : const SizedBox(),
+                        (state is RestaurantLoaded)
+                            ? Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0),
+                                child: Text(
+                                  'Restaurants around you',
+                                  style: kTitle2.copyWith(
+                                      fontWeight: FontWeight.bold),
+                                ),
+                              )
+                            : spacer,
+                        (state is RestaurantFilterApplied)
+                            ? ClearFilterWidget(onTap: () {
+                                restaurantCubit.resetFilter(allRestaurants,
                                     recentSearchedRestaurantsList.value);
-                            _searchTextController.text = '';
-                          })
-                        : const SizedBox(),
-                    RestaurantListView(
-                        restaurantsList: restaurantsList,
-                        recentSearchedRestaurantsList:
-                            recentSearchedRestaurantsList)
-                  ]),
-            );
-          } else {
-            return const LoadingScreen();
-          }
-        },
+                                _searchTextController.text = '';
+                              })
+                            : const SizedBox(),
+                        RestaurantListView(
+                          restaurantsList: restaurantsList,
+                          recentSearchedRestaurantsList:
+                              recentSearchedRestaurantsList,
+                        )
+                      ]),
+                );
+              } else {
+                return const LoadingScreen();
+              }
+            },
+          ),
+        ),
       ),
     );
   }
@@ -253,5 +260,14 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+
+  void showFloating() {
+    if (_scrollController.offset > 10 && !showFloatingActionButton.value) {
+      showFloatingActionButton.value = true;
+    }
+    if (_scrollController.offset < 10 && showFloatingActionButton.value) {
+      showFloatingActionButton.value = false;
+    }
   }
 }

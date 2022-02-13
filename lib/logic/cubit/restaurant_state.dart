@@ -14,17 +14,22 @@ class RestaurantLoading extends RestaurantState {
 }
 
 class RestaurantLoaded extends RestaurantState {
+  final int? page;
   final List<Restaurant> restaurantsList;
   final List<Restaurant> recentSearchedRestaurantsList;
   const RestaurantLoaded(
-      this.restaurantsList, this.recentSearchedRestaurantsList);
+      this.restaurantsList, this.recentSearchedRestaurantsList,
+      {this.page});
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
 
     return other is RestaurantLoaded &&
-        UtilFunctions.listEquals(other.restaurantsList, restaurantsList);
+        UtilFunctions.listEquals(other.restaurantsList, restaurantsList) &&
+        UtilFunctions.listEquals(other.recentSearchedRestaurantsList,
+            recentSearchedRestaurantsList) &&
+        (other.page == page);
   }
 
   @override

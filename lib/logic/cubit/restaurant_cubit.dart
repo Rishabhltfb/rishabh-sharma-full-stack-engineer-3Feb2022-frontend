@@ -12,14 +12,20 @@ part 'restaurant_state.dart';
 class RestaurantCubit extends Cubit<RestaurantState> {
   final RestaurantRepository _restaurantRepository = RestaurantRepository();
   final FilterRepository _filterRepository = FilterRepository();
+  final List<Restaurant> _allRestaurant = [];
 
   RestaurantCubit() : super(const RestaurantInitial());
 
-  Future<List<Restaurant>> fetchAllRestaurants() async {
+  Future<List<Restaurant>> fetchRestaurants(
+      int page, List<Restaurant> recentSearchedRestaurantsList) async {
     try {
+      log('fetch Restaurant Page $page');
       List<Restaurant> restaurantsList =
-          await _restaurantRepository.fetchAllRestaurants();
-      emit(RestaurantLoaded(restaurantsList, const []));
+          await _restaurantRepository.fetchRestaurants(page);
+      _allRestaurant.addAll(restaurantsList);
+      log('Total restaurants : ${_allRestaurant.length.toString()}');
+      emit(RestaurantLoaded(_allRestaurant, recentSearchedRestaurantsList,
+          page: page));
       return restaurantsList;
     } catch (err) {
       log(err.toString());

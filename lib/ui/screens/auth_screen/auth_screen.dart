@@ -54,17 +54,19 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     double height = getDeviceHeight(context);
     double width = getDeviceWidth(context);
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: SizedBox(
-          height: height,
-          width: width,
-          child: Stack(
-            children: [
-              bgImage(height, width),
-              mask(height, width),
-              body(height, width),
-            ],
+    return SafeArea(
+      child: Scaffold(
+        body: SingleChildScrollView(
+          child: SizedBox(
+            height: height,
+            width: width,
+            child: Stack(
+              children: [
+                bgImage(height, width),
+                mask(height, width),
+                body(height, width),
+              ],
+            ),
           ),
         ),
       ),
@@ -271,7 +273,7 @@ class _AuthScreenState extends State<AuthScreen> {
         bool success = await authCubit.signIn(authBody);
         if (success) {
           Future.wait([
-            restaurantCubit.fetchAllRestaurants(),
+            restaurantCubit.fetchRestaurants(1, []),
             userCubit.getUser(),
             collectionCubit.getUserCollections(),
           ]);

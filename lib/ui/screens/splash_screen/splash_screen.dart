@@ -59,7 +59,7 @@ class _SplashScreenState extends State<SplashScreen> {
             Future.delayed(const Duration(seconds: 4)).then((value) {
               if (isTokenValid) {
                 Future.wait([
-                  restaurantCubit.fetchAllRestaurants(),
+                  restaurantCubit.fetchRestaurants(1, []),
                   userCubit.getUser(),
                   collectionCubit.getUserCollections(),
                 ]);
