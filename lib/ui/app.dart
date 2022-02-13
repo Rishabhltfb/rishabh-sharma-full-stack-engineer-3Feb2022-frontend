@@ -4,6 +4,7 @@ import 'package:client/logic/cubit/collection_cubit.dart';
 import 'package:client/logic/cubit/restaurant_cubit.dart';
 import 'package:client/logic/cubit/user_cubit.dart';
 import 'package:client/utils/app_utils.dart';
+import 'package:client/utils/scroll_behaviour.dart';
 import 'package:client/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:client/ui/routes/routes_generator.dart' as router;
@@ -60,6 +61,12 @@ class _AppState extends State<App> {
       ],
       child: MaterialApp(
         navigatorKey: navigatorKey,
+        builder: (context, child) {
+          return ScrollConfiguration(
+            behavior: CustomScrollBehaviour(),
+            child: child!,
+          );
+        },
         debugShowCheckedModeBanner: false,
         title: appName,
         theme: theme,

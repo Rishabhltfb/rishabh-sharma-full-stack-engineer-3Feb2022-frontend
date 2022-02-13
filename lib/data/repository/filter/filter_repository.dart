@@ -16,10 +16,12 @@ class FilterRepository {
   Future<List<Restaurant>> filterByRestaurantName(String name) async {
     List<Restaurant> restaurantList = [];
     Response res = await _filterApi.filterByRestaurantName(name);
-    dynamic data = res.data['data'];
-    data.forEach((ele) {
-      restaurantList.add(Restaurant.fromMap(ele));
-    });
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      dynamic data = res.data['data'];
+      data.forEach((ele) {
+        restaurantList.add(Restaurant.fromMap(ele));
+      });
+    }
     return restaurantList;
   }
 
@@ -27,10 +29,12 @@ class FilterRepository {
       String day, int startTime, int endTime) async {
     List<Restaurant> restaurantList = [];
     Response res = await _filterApi.filterByDayTime(day, startTime, endTime);
-    dynamic data = res.data['data'];
-    data.forEach((ele) {
-      restaurantList.add(Restaurant.fromMap(ele));
-    });
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      dynamic data = res.data['data'];
+      data.forEach((ele) {
+        restaurantList.add(Restaurant.fromMap(ele));
+      });
+    }
     return restaurantList;
   }
 }

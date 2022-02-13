@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:client/data/api/restaurant/restaurant_api.dart';
 import 'package:client/data/models/restaurant.dart';
 import 'package:dio/dio.dart';
@@ -12,14 +11,15 @@ class RestaurantRepository {
   factory RestaurantRepository() {
     return instance;
   }
-  Future<List<Restaurant>> fetchAllRestaurants() async {
+  Future<List<Restaurant>> fetchRestaurants(int page) async {
     List<Restaurant> restaurantList = [];
-    Response res = await _restaurantApi.fetchAllRestaurants();
-
-    dynamic data = res.data['data'];
-    data.forEach((ele) {
-      restaurantList.add(Restaurant.fromMap(ele));
-    });
+    Response res = await _restaurantApi.fetchRestaurants(page);
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      dynamic data = res.data['data'];
+      data.forEach((ele) {
+        restaurantList.add(Restaurant.fromMap(ele));
+      });
+    }
     return restaurantList;
   }
 

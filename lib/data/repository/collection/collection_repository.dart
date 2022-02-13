@@ -16,10 +16,12 @@ class CollectionRepository {
   Future<List<Collection>> getUserCollections() async {
     List<Collection> collectionList = [];
     Response res = await _collectionApi.getUserCollections();
-    dynamic data = res.data['data'];
-    data.forEach((ele) {
-      collectionList.add(Collection.fromMap(ele));
-    });
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      dynamic data = res.data['data'];
+      data.forEach((ele) {
+        collectionList.add(Collection.fromMap(ele));
+      });
+    }
     return collectionList;
   }
 
@@ -27,15 +29,19 @@ class CollectionRepository {
       Collection collection, String userId) async {
     Response res =
         await _collectionApi.createUserCollection(collection, userId);
-    dynamic data = res.data['data'];
-    return Collection.fromMap(data);
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      dynamic data = res.data['data'];
+      return Collection.fromMap(data);
+    } else {
+      return Collection.fromMap({});
+    }
   }
 
   Future<bool> updateCollection(
       Collection updatedCollection, String userId) async {
     Response res =
         await _collectionApi.updateCollection(updatedCollection, userId);
-    if (res.statusCode == 200) {
+    if (res.statusCode == 200 || res.statusCode == 201) {
       return true;
     }
     return false;
@@ -45,7 +51,7 @@ class CollectionRepository {
       Restaurant restaurant, String collectionId) async {
     Response res = await _collectionApi.addRestaurantToCollection(
         restaurant, collectionId);
-    if (res.statusCode == 200) {
+    if (res.statusCode == 200 || res.statusCode == 201) {
       return true;
     }
     return false;

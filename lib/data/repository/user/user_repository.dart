@@ -15,7 +15,11 @@ class UserRepository {
 
   Future<User> getUser() async {
     Response res = await _userApi.getUser();
-    dynamic data = res.data['data'];
-    return User.fromMap(data);
+    if (res.statusCode == 200 || res.statusCode == 201) {
+      dynamic data = res.data['data'];
+      return User.fromMap(data);
+    } else {
+      return User.empty();
+    }
   }
 }

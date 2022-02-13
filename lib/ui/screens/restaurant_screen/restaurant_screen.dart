@@ -17,77 +17,37 @@ class RestaurantScreen extends StatefulWidget {
 }
 
 class _RestaurantScreenState extends State<RestaurantScreen> {
-  ValueNotifier<bool> isFav = ValueNotifier(false);
-  late CollectionCubit collectionCubit;
-
-  @override
-  void initState() {
-    super.initState();
-    CollectionState state = BlocProvider.of<CollectionCubit>(context).state;
-    checkFav(state);
-  }
-
-  void checkFav(CollectionState state) {
-    if (state is CollectionLoaded) {
-      int collectionLen = state.collectionsList.length;
-      for (int i = 0; i < collectionLen; i++) {
-        int restaurantLen = state.collectionsList[i].restaurants.length;
-        for (int j = 0; j < restaurantLen; j++) {
-          Restaurant restaurant = state.collectionsList[i].restaurants[j];
-          if (restaurant.id == widget.restaurant.id) {
-            isFav.value = true;
-            break;
-          }
-        }
-        if (isFav.value) {
-          break;
-        }
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     double height = getDeviceHeight(context);
     double width = getDeviceWidth(context);
 
-    return Scaffold(
-      body: SizedBox(
-        height: height,
-        child: Stack(
-          children: [
-            bgImage(height * 0.45, width, widget.restaurant.image),
-            mask(height * 0.45, width),
-            Positioned(
-                bottom: 0, child: detailCard(widget.restaurant, height, width)),
-            Padding(
+    return SafeArea(
+      child: Scaffold(
+        body: SizedBox(
+          height: height,
+          child: Stack(
+            children: [
+              bgImage(height * 0.45, width, widget.restaurant.image),
+              mask(height * 0.45, width),
+              Positioned(
+                  bottom: 0,
+                  child: detailCard(widget.restaurant, height, width)),
+              Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 50),
-                child: ValueListenableBuilder(
-                  valueListenable: isFav,
-                  builder: (context, value, child) => Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      IconButton(
-                          onPressed: () => Navigator.of(context).pop(),
-                          icon: const Icon(Icons.arrow_back,
-                              color: Colors.white)),
-                      IconButton(
-                          onPressed: () {
-                            if (isFav.value) {
-                            } else {
-                              // collection
-                            }
-                            isFav.value = !isFav.value;
-                          },
-                          icon: isFav.value
-                              ? const Icon(Icons.favorite, color: Colors.white)
-                              : const Icon(Icons.favorite_outline,
-                                  color: Colors.white))
-                    ],
-                  ),
-                )),
-          ],
+                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 30),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon:
+                            const Icon(Icons.arrow_back, color: Colors.white)),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

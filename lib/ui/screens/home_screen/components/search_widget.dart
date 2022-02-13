@@ -10,11 +10,13 @@ import 'package:time_picker_widget/time_picker_widget.dart';
 class SearchWidget extends StatelessWidget {
   final ValueNotifier<bool> searchError;
   final TextEditingController searchTextController;
+  final BuildContext scaffoldContext;
 
   const SearchWidget({
     Key? key,
     required this.searchError,
     required this.searchTextController,
+    required this.scaffoldContext,
   }) : super(key: key);
 
   @override
@@ -41,10 +43,15 @@ class SearchWidget extends StatelessWidget {
                     if (startTime != -1) {
                       int endTime =
                           await timePicker(context, 'Pick Ending time');
+
                       if (endTime != -1) {
-                        BlocProvider.of<RestaurantCubit>(context)
-                            .filterByDayTime(DummyData().weekdays[day - 1],
-                                startTime, endTime);
+                        if (startTime < endTime) {
+                          BlocProvider.of<RestaurantCubit>(context)
+                              .filterByDayTime(DummyData().weekdays[day - 1],
+                                  startTime, endTime);
+                        } else {
+                          showSnackBar();
+                        }
                       }
                     }
                   }
@@ -140,5 +147,26 @@ class SearchWidget extends StatelessWidget {
     } else {
       return -1;
     }
+  }
+
+  void showSnackBar() {
+    ScaffoldMessenger.of(scaffoldContext).showSnackBar(
+      const SnackBar(
+        backgroundColor: Colors.black,
+        duration: Duration(seconds: 1),
+        elevation: 2,
+        content: SizedBox(
+          height: 50,
+          child: Center(
+            child: Text(
+              'Invalid Time Picked',
+              style: TextStyle(
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
