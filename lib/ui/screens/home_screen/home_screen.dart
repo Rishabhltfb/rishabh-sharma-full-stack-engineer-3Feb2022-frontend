@@ -30,6 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   ValueNotifier<String> restaurantSearch = ValueNotifier('');
   ValueNotifier<bool> searchError = ValueNotifier(false);
   ValueNotifier<bool> showFloatingActionButton = ValueNotifier(false);
+  ValueNotifier<bool> listLoading = ValueNotifier(false);
   ValueNotifier<int> paginationPage = ValueNotifier(1);
   List<Restaurant> allRestaurants = [];
   ValueNotifier<List<Restaurant>> recentSearchedRestaurantsList =
@@ -48,12 +49,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void pagination() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent &&
+        !listLoading.value) {
       log('Fetch Pagination data for page ${(paginationPage.value + 1).toString()}');
+      listLoading.value = true;
       restaurantCubit.fetchRestaurants(
           paginationPage.value + 1, recentSearchedRestaurantsList.value);
       paginationPage.value = paginationPage.value + 1;
+      Future.delayed(
+          const Duration(seconds: 1), () => listLoading.value = false);
     }
   }
 
@@ -63,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
     searchError.dispose();
     showFloatingActionButton.dispose();
     _scrollController.dispose();
+    listLoading.dispose();
     recentSearchedRestaurantsList.dispose();
     super.dispose();
   }
@@ -171,6 +177,15 @@ class _HomeScreenState extends State<HomeScreen> {
                           restaurantsList: restaurantsList,
                           recentSearchedRestaurantsList:
                               recentSearchedRestaurantsList,
+                        ),
+                        ValueListenableBuilder(
+                          valueListenable: listLoading,
+                          builder: (context, value, child) => listLoading.value
+                              ? const Center(
+                                  child: CircularProgressIndicator(
+                                      color: Colors.black),
+                                )
+                              : const SizedBox(),
                         )
                       ]),
                 );

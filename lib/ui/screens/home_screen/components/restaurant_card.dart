@@ -27,7 +27,6 @@ class RestaurantCard extends StatelessWidget {
           borderRadius: borderRadius,
           elevation: 5.0,
           child: Container(
-            height: height * 0.25,
             width: width * 0.45,
             decoration: BoxDecoration(
               color: Colors.white,
@@ -53,6 +52,7 @@ class RestaurantCard extends StatelessWidget {
                   maxLines: 1,
                   style: kBody2.copyWith(fontWeight: FontWeight.w500),
                 ),
+                spacer,
               ],
             ),
           ),

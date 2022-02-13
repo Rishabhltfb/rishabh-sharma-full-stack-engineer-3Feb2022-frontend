@@ -71,12 +71,15 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
   }
 
   Widget bgImage(double height, double width, String image) {
-    return SizedBox(
-      height: height,
-      width: width,
-      child: Image.asset(
-        image,
-        fit: BoxFit.cover,
+    return Hero(
+      tag: widget.restaurant.id ?? widget.restaurant.restaurantName,
+      child: SizedBox(
+        height: height,
+        width: width,
+        child: Image.asset(
+          image,
+          fit: BoxFit.cover,
+        ),
       ),
     );
   }
@@ -87,7 +90,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
     return Container(
       height: height * 0.65,
       width: width,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),
+      padding: const EdgeInsets.only(left: 16, bottom: 16, top: 30),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -96,6 +99,7 @@ class _RestaurantScreenState extends State<RestaurantScreen> {
         ),
       ),
       child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

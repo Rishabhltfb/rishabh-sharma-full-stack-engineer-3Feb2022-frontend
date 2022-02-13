@@ -6,6 +6,7 @@ import 'package:client/logic/cubit/collection_cubit.dart';
 import 'package:client/logic/cubit/restaurant_cubit.dart';
 import 'package:client/logic/cubit/user_cubit.dart';
 import 'package:client/ui/common_widgets/custom_button.dart';
+import 'package:client/ui/screens/auth_screen/components/auth_text_field.dart';
 import 'package:client/ui/screens/home_screen/home_screen.dart';
 import 'package:client/utils/assets.dart';
 import 'package:client/utils/dimensions.dart';
@@ -24,6 +25,7 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final ValueNotifier<bool> _emailValidated = ValueNotifier(false);
   final ValueNotifier<bool> _passwordValidated = ValueNotifier(false);
+  final ValueNotifier<bool> isLoading = ValueNotifier(false);
   final ValueNotifier<String> email = ValueNotifier('');
   final ValueNotifier<String> password = ValueNotifier('');
   late AuthCubit authCubit;
@@ -46,13 +48,14 @@ class _AuthScreenState extends State<AuthScreen> {
     _emailValidated.dispose();
     _passwordValidated.dispose();
     email.dispose();
+    isLoading.dispose();
     password.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    double height = getDeviceHeight(context);
+    double height = getViewportHeight(context);
     double width = getDeviceWidth(context);
     return SafeArea(
       child: Scaffold(
@@ -64,7 +67,7 @@ class _AuthScreenState extends State<AuthScreen> {
               children: [
                 bgImage(height, width),
                 mask(height, width),
-                body(height, width),
+                body(height, width, context),
               ],
             ),
           ),
@@ -73,7 +76,7 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Positioned body(double height, double width) {
+  Positioned body(double height, double width, BuildContext context) {
     Widget spacer = const SizedBox(height: 16);
     return Positioned(
       bottom: height * 0.1,
@@ -93,32 +96,29 @@ class _AuthScreenState extends State<AuthScreen> {
               valueListenable: _emailValidated,
               builder: (context, value, child) => SizedBox(
                 width: width * 0.8,
-                child: createTextField(
-                    'Email Address', 'Please enter your email', '',
+                child: AuthTextField(
+                    title: 'Email Address',
+                    hintText: 'Please enter your email',
                     onChanged: (String value) {
-                  email.value = value;
-                }),
+                      email.value = value;
+                    }),
               ),
             ),
             spacer,
             spacer,
-            ValueListenableBuilder(
-              valueListenable: _passwordValidated,
-              builder: (context, value, child) => SizedBox(
-                width: width * 0.8,
-                child: createTextField(
-                  'Password',
-                  'Please enter password',
-                  '',
-                  onChanged: (String value) {
-                    password.value = value;
-                  },
-                ),
+            SizedBox(
+              width: width * 0.8,
+              child: AuthTextField(
+                title: 'Password',
+                hintText: 'Please enter password',
+                onChanged: (String value) {
+                  password.value = value;
+                },
               ),
             ),
             ValueListenableBuilder(
               valueListenable: _passwordValidated,
-              builder: (context, value, child) => _passwordValidated.value
+              builder: (context, value, child) => !_passwordValidated.value
                   ? Text(
                       'Invalid Credentials',
                       textAlign: TextAlign.left,
@@ -130,10 +130,18 @@ class _AuthScreenState extends State<AuthScreen> {
             spacer,
             spacer,
             spacer,
-            CustomButton(
-              text: 'Signin',
-              width: width * 0.7,
-              onTap: submit,
+            ValueListenableBuilder(
+              valueListenable: isLoading,
+              builder: (context, value, child) => isLoading.value
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ))
+                  : CustomButton(
+                      text: 'Signin',
+                      width: width * 0.7,
+                      onTap: submit,
+                    ),
             ),
           ],
         ),
@@ -184,90 +192,13 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 
-  Widget createTextField(
-    title,
-    hintText,
-    textFieldInitialValue, {
-    Color? filledColor,
-    bool enabled = true,
-    Function? onChanged,
-    bool error = false,
-  }) {
-    final outlineInputBorder = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(30.0),
-    );
-    Colors.white;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        createTextFieldTitle(title, error: error),
-        SizedBox(
-          height: 50,
-          child: Stack(
-            children: [
-              TextFormField(
-                initialValue: textFieldInitialValue,
-                textInputAction: TextInputAction.done,
-                enabled: enabled,
-                onChanged: (value) {
-                  if (onChanged != null) {
-                    onChanged(value);
-                  }
-                },
-                decoration: InputDecoration(
-                  fillColor: Colors.white,
-                  filled: true,
-                  hintText: hintText,
-                  hintStyle: const TextStyle(color: Colors.black),
-                  contentPadding: const EdgeInsets.symmetric(
-                    vertical: 10.0,
-                    horizontal: 20.0,
-                  ),
-                  focusedBorder: outlineInputBorder,
-                  enabledBorder: outlineInputBorder,
-                  disabledBorder: outlineInputBorder,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget createTextFieldTitle(String title,
-      {bool error = false, Color color = Colors.white}) {
-    if (error) {
-      color = Colors.red;
-    }
-    return Container(
-      alignment: Alignment.topLeft,
-      padding: const EdgeInsets.only(left: 10, bottom: 8, right: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              color: color,
-            ),
-          ),
-          error
-              ? Text(
-                  '* Necessary',
-                  style: TextStyle(
-                    color: color.withOpacity(0.5),
-                  ),
-                )
-              : Container(),
-        ],
-      ),
-    );
-  }
-
   void submit() async {
     {
+      log('Submit button');
+      isLoading.value = true;
       if (email.value.isNotEmpty && password.value.isNotEmpty) {
+        _emailValidated.value = true;
+        _passwordValidated.value = true;
         AuthBody authBody =
             AuthBody(email: email.value, password: password.value);
         bool success = await authCubit.signIn(authBody);
@@ -277,14 +208,17 @@ class _AuthScreenState extends State<AuthScreen> {
             userCubit.getUser(),
             collectionCubit.getUserCollections(),
           ]);
+          isLoading.value = false;
           Navigator.pushReplacementNamed(context, HomeScreen.route);
         } else {
+          log('Here');
           _passwordValidated.value = false;
           _emailValidated.value = false;
         }
       } else {
         _passwordValidated.value = false;
         _emailValidated.value = false;
+        isLoading.value = false;
       }
     }
   }

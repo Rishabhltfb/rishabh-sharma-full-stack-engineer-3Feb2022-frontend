@@ -42,22 +42,24 @@ class RestaurantTile extends StatelessWidget {
               children: [
                 Flexible(
                   flex: 1,
-                  child: Hero(
-                    tag: restaurant.id ?? restaurant.restaurantName,
-                    child: Container(
-                      height: vpH * 0.16,
-                      width: vpW * 0.3,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(30),
-                        ),
+                  child: Container(
+                    height: vpH * 0.16,
+                    width: vpW * 0.3,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(30),
                       ),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(10),
-                            topLeft: Radius.circular(10)),
-                        child: Image.asset(restaurant.image, fit: BoxFit.cover),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(10),
+                          topLeft: Radius.circular(10)),
+                      child: Hero(
+                        tag: restaurant.id ?? restaurant.restaurantName,
+                        child: SizedBox(
+                            child: Image.asset(restaurant.image,
+                                fit: BoxFit.cover)),
                       ),
                     ),
                   ),
