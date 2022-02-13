@@ -22,7 +22,6 @@ class CollectionApi {
     Response res;
     try {
       res = await _client.dio.get(BASE_URL + url);
-      log(res.toString(), name: 'Filter res:');
     } catch (err) {
       throw Exception(err);
     }
@@ -40,7 +39,6 @@ class CollectionApi {
     Response res;
     try {
       res = await _client.dio.post(BASE_URL + url, data: data);
-      log(res.toString(), name: 'Create Collection day res:');
     } catch (err) {
       throw Exception(err);
     }
@@ -59,7 +57,6 @@ class CollectionApi {
     Response res;
     try {
       res = await _client.dio.put(BASE_URL + url, data: data);
-      log(res.toString(), name: 'Add restaurant to collection res:');
     } catch (err) {
       throw Exception(err);
     }
@@ -73,7 +70,6 @@ class CollectionApi {
     Response res;
     try {
       res = await _client.dio.put(BASE_URL + url, data: data);
-      log(res.toString(), name: 'Add restaurant to collection res:');
     } catch (err) {
       throw Exception(err);
     }

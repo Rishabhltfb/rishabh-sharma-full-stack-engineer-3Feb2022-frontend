@@ -33,7 +33,6 @@ class RestaurantApi {
     Response res;
     try {
       res = await _client.dio.post(BASE_URL + url, data: restaurant.toJson());
-      log(res.toString(), name: 'Restaurant add res:');
     } catch (err) {
       throw Exception(err);
     }

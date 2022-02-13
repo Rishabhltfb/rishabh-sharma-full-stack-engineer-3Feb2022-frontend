@@ -10,12 +10,11 @@ import 'package:time_picker_widget/time_picker_widget.dart';
 class SearchWidget extends StatelessWidget {
   final ValueNotifier<bool> searchError;
   final TextEditingController searchTextController;
-  final Function(int initialTime, int finalTime) getTime;
+
   const SearchWidget({
     Key? key,
     required this.searchError,
     required this.searchTextController,
-    required this.getTime,
   }) : super(key: key);
 
   @override

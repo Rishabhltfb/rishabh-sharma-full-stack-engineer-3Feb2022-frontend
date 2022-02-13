@@ -129,7 +129,7 @@ class _AuthScreenState extends State<AuthScreen> {
             spacer,
             spacer,
             CustomButton(
-              text: 'SignIn',
+              text: 'Signin',
               width: width * 0.7,
               onTap: submit,
             ),
@@ -161,7 +161,7 @@ class _AuthScreenState extends State<AuthScreen> {
       height: height,
       width: width,
       child: Image.asset(
-        RestaurantAssets.authBg3,
+        RestaurantAssets.authBg,
         fit: BoxFit.fitHeight,
       ),
     );
@@ -265,7 +265,6 @@ class _AuthScreenState extends State<AuthScreen> {
 
   void submit() async {
     {
-      log('Inside submit function');
       if (email.value.isNotEmpty && password.value.isNotEmpty) {
         AuthBody authBody =
             AuthBody(email: email.value, password: password.value);

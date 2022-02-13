@@ -22,7 +22,6 @@ class FilterApi {
     try {
       res = await _client.dio
           .get(BASE_URL + url, queryParameters: queryParameters);
-      log(res.toString(), name: 'Filter res:');
     } catch (err) {
       throw Exception(err);
     }
@@ -41,7 +40,6 @@ class FilterApi {
     try {
       res = await _client.dio
           .get(BASE_URL + url, queryParameters: queryParameters);
-      log(res.toString(), name: 'Filter day res:');
     } catch (err) {
       throw Exception(err);
     }

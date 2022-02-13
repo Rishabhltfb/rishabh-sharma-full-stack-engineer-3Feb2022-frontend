@@ -48,15 +48,12 @@ class _SplashScreenState extends State<SplashScreen> {
     return Scaffold(
       body: BlocListener<AuthCubit, AuthState>(
         listenWhen: (previous, current) {
-          log('inside listen when');
           if (current is AuthLoaded) {
             return true;
           }
           return false;
         },
         listener: (context, state) async {
-          // TODO: implement listener
-          log('Inside Listener', name: 'AuthCubit');
           if (state is AuthLoaded) {
             bool isTokenValid = state.isAuthenticated;
             Future.delayed(const Duration(seconds: 4)).then((value) {

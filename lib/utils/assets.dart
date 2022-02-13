@@ -3,8 +3,6 @@ class RestaurantAssets {
 
   /// [Pictures]
   static const String authBg = 'assets/images/authBg.jpeg';
-  static const String authBg2 = 'assets/images/authBg2.jpeg';
-  static const String authBg3 = 'assets/images/authBg3.jpeg';
   static const String cuisine1 = 'assets/images/cuisine1.jpeg';
   static const String cuisine2 = 'assets/images/cuisine2.jpeg';
   static const String cuisine3 = 'assets/images/cuisine3.jpeg';

@@ -91,7 +91,6 @@ class _HomeScreenState extends State<HomeScreen> {
       physics: const BouncingScrollPhysics(),
       child: BlocBuilder<RestaurantCubit, RestaurantState>(
         builder: (context, state) {
-          log('Restaurant Screen State Rebuild');
           if ((state is RestaurantLoaded) ||
               (state is RestaurantFilterApplied)) {
             List<Restaurant> restaurantsList = [];
@@ -115,10 +114,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: SearchWidget(
                         searchError: searchError,
                         searchTextController: _searchTextController,
-                        getTime: (initialTime, finalTime) {
-                          log(initialTime.toString());
-                          log(finalTime.toString());
-                        },
                       ),
                     ),
                     spacer,

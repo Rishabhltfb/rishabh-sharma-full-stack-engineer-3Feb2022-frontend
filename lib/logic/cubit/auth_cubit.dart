@@ -14,10 +14,9 @@ class AuthCubit extends Cubit<AuthState> {
   AuthCubit() : super(const AuthInitial());
 
   Future<void> isAuthenticated() async {
-    log('Inside Auth Cubit is Authenticated');
     emit(const AuthLoading());
     bool isAuthenticated = await TokenService().init();
-    log(isAuthenticated.toString());
+
     emit(AuthLoaded(isAuthenticated));
   }
 

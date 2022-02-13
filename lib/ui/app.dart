@@ -1,8 +1,8 @@
+import 'package:client/data/models/dummy_data.dart';
 import 'package:client/logic/cubit/auth_cubit.dart';
 import 'package:client/logic/cubit/collection_cubit.dart';
 import 'package:client/logic/cubit/restaurant_cubit.dart';
 import 'package:client/logic/cubit/user_cubit.dart';
-import 'package:client/ui/screens/splash_screen/splash_screen.dart';
 import 'package:client/utils/app_utils.dart';
 import 'package:client/utils/theme.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +24,17 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    for (var img in DummyData().cussineList) {
+      precacheImage(AssetImage(img['url'] ?? ''), context);
+    }
+    for (var img in DummyData().restaurantImageList) {
+      precacheImage(AssetImage(img), context);
+    }
+    super.didChangeDependencies();
   }
 
   @override
@@ -52,7 +63,6 @@ class _AppState extends State<App> {
         debugShowCheckedModeBanner: false,
         title: appName,
         theme: theme,
-        // home: const SplashScreen(),
         onGenerateRoute: router.Router.generateRoute,
       ),
     );
