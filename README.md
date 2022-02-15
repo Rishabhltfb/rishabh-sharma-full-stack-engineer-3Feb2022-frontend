@@ -22,11 +22,17 @@ A mobile application backed by [Glints-Restaurant-Backend](https://github.com/Ri
 - [Heroku](http://heroku.com/) for deployment purpose.
 
 
-## Note:
+## Instructions:
 - To build this mobile application, follow the steps below:
   - clone this repository and install flutter in your system.
-  - Copy .env.sample content in your own .env file and customize it according to your environment.
-  - type command `flutter run` in project directory terminal.
+  - Create .env file in root directory.
+  - Copy .env.sample content in your own .env file and add your `IP_ADDRESS` to use local server.
+  - Goto `lib/constants/api_routes.dart` and comment/uncomment `BASE_URL` variable according to your use.
+  - Install dependencies using command `flutter pub get`
+  - Connect an emulator android/ios to your code editor or use usb debugging.
+  - If you are using usb debugging with local server make sure you are on same network.
+  - Run project in debug mode using command `flutter run` in project directory terminal.
+  - Run project in release mode using command `flutter run --release`
 
 ### Deployment Links:
 [APK](https://drive.google.com/file/d/1oTMrcZLVYaXciOFsjebVnoxf0Z9b8GiY/view?usp=sharing)
